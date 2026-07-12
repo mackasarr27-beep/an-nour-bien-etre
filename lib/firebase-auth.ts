@@ -1,7 +1,9 @@
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   type User,
 } from "firebase/auth";
@@ -16,7 +18,10 @@ export type AuthProfile = {
   role: UserRole;
 };
 
-export const ADMIN_EMAILS = ["admin@an-nour-bien-etre.com"];
+export const ADMIN_EMAILS = ["mackasarr27@gmail.com"];
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
 function isAdminEmail(email?: string | null) {
   return Boolean(email && ADMIN_EMAILS.includes(email.toLowerCase()));
@@ -61,6 +66,12 @@ export async function signInWithFirebase(email: string, password: string) {
 
 export async function registerWithFirebase(email: string, password: string) {
   const result = await createUserWithEmailAndPassword(auth, email, password);
+  await ensureUserProfile(result.user);
+  return result;
+}
+
+export async function signInWithGoogle() {
+  const result = await signInWithPopup(auth, googleProvider);
   await ensureUserProfile(result.user);
   return result;
 }

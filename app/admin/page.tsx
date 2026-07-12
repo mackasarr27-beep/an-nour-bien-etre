@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { registerWithFirebase, signInWithFirebase } from "../../lib/firebase-auth";
+import { ADMIN_EMAILS, registerWithFirebase, signInWithFirebase, signInWithGoogle } from "../../lib/firebase-auth";
 import useAuth from "../../hooks/useAuth";
 
 export default function AdminLoginPage() {
@@ -23,8 +23,9 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError(null);
     try {
-      await signInWithFirebase(email, password);
-      router.replace("/admin/dashboard");
+      const result = await signInWithFirebase(email, password);
+      const isAdmin = ADMIN_EMAILS.includes((result.user.email || "").toLowerCase());
+      router.replace(isAdmin ? "/admin/dashboard" : "/");
     } catch (err: any) {
       setError(err.message || "Connexion impossible");
     } finally {
@@ -36,10 +37,25 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError(null);
     try {
-      await registerWithFirebase(email, password);
-      router.replace("/admin/dashboard");
+      const result = await registerWithFirebase(email, password);
+      const isAdmin = ADMIN_EMAILS.includes((result.user.email || "").toLowerCase());
+      router.replace(isAdmin ? "/admin/dashboard" : "/");
     } catch (err: any) {
       setError(err.message || "Création du compte impossible");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await signInWithGoogle();
+      const isAdmin = ADMIN_EMAILS.includes((result.user.email || "").toLowerCase());
+      router.replace(isAdmin ? "/admin/dashboard" : "/");
+    } catch (err: any) {
+      setError(err.message || "Connexion Google impossible");
     } finally {
       setLoading(false);
     }
@@ -62,6 +78,9 @@ export default function AdminLoginPage() {
           </button>
           <button type="button" onClick={handleCreateAdmin} disabled={loading} className="w-full rounded-full border border-gray-200 px-4 py-3 font-semibold text-gray-700">
             {loading ? "Création..." : "Créer le compte administrateur"}
+          </button>
+          <button type="button" onClick={handleGoogleSignIn} disabled={loading} className="w-full rounded-full border border-emerald-200 bg-emerald-50 px-4 py-3 font-semibold text-emerald-700">
+            {loading ? "Connexion..." : "Se connecter avec Google"}
           </button>
         </form>
       </div>

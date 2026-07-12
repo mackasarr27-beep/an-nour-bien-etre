@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import WhatsAppButton from "./WhatsAppButton";
 import CallButton from "./CallButton";
+import useAuth from "../hooks/useAuth";
 
 const links = [
   { href: "/", label: "Accueil" },
@@ -18,6 +19,8 @@ const links = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { profile, loading } = useAuth();
+  const isAdmin = !loading && profile?.role === "admin";
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl dark:bg-black/95">
@@ -36,6 +39,11 @@ export default function Navbar() {
                 {l.label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link href="/admin/dashboard" className="rounded-full bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500">
+                Administration
+              </Link>
+            )}
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
@@ -72,6 +80,11 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link href="/admin/dashboard" className="rounded-xl bg-emerald-600 px-3 py-3 text-center font-semibold text-white" onClick={() => setOpen(false)}>
+              Administration
+            </Link>
+          )}
           <div className="mt-2 flex flex-wrap gap-2">
             <WhatsAppButton />
             <CallButton />
