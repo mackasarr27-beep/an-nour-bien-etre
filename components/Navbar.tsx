@@ -20,63 +20,59 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="w-full bg-white/80 dark:bg-black/80 backdrop-blur-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="sticky top-0 z-40 w-full bg-white/85 backdrop-blur-xl dark:bg-black/80">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <Image src="/Bannière.png" alt="An Nour" width={48} height={48} className="object-contain rounded" />
+              <Image src="/Bannière.png" alt="An Nour" width={48} height={48} className="rounded object-contain" />
               <span className="font-semibold">AN NOUR</span>
             </Link>
           </div>
 
-          <nav className="hidden md:flex items-center gap-4">
+          <nav className="hidden items-center gap-4 md:flex">
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className="text-sm hover:underline">
+              <Link key={l.href} href={l.href} className="text-sm transition hover:underline">
                 {l.label}
               </Link>
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
-            <a href="/search" className="text-sm px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">Recherche</a>
-            <a href="/cart" className="text-sm px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800">Panier</a>
+          <div className="hidden items-center gap-3 md:flex">
+            <a href="/search" className="rounded px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Recherche</a>
+            <a href="/cart" className="rounded px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Panier</a>
             <WhatsAppButton />
             <CallButton />
           </div>
 
-          {/* Mobile hamburger */}
-          <div className="md:hidden flex items-center">
+          <div className="flex items-center md:hidden">
             <button
               aria-label="Menu"
-              className="p-2 rounded-md focus:outline-none"
+              className="rounded-full border border-gray-200 bg-white/90 p-2 shadow-sm transition hover:scale-105 dark:border-gray-700 dark:bg-gray-900"
               onClick={() => setOpen((v) => !v)}
             >
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  className={`transition-transform duration-300 ${open ? "transform rotate-45 translate-y-0.5" : ""}`}
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d={open ? "M6 6L18 18M6 18L18 6" : "M4 6h16M4 12h16M4 18h16"} />
               </svg>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu panel */}
-      <div
-        className={`md:hidden fixed inset-x-4 top-20 z-50 rounded-lg bg-white/95 dark:bg-gray-900/95 shadow-lg transform transition-all duration-300 origin-top ${open ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
-      >
-        <div className="px-4 py-4 flex flex-col gap-3">
+      <div className={`fixed inset-0 z-30 bg-black/20 backdrop-blur-sm transition-opacity duration-300 md:hidden ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setOpen(false)} />
+
+      <div className={`fixed inset-x-3 top-16 z-40 mx-auto max-w-2xl rounded-2xl border border-gray-200 bg-white/95 p-4 shadow-2xl transition-all duration-300 md:hidden ${open ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"}`}>
+        <div className="flex items-center justify-between">
+          <span className="font-semibold">Navigation</span>
+          <button className="rounded-full p-2 hover:bg-gray-100" onClick={() => setOpen(false)} aria-label="Fermer le menu">✕</button>
+        </div>
+        <div className="mt-4 flex flex-col gap-2">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="py-2 px-3 rounded hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setOpen(false)}>
+            <Link key={l.href} href={l.href} className="rounded-xl px-3 py-3 transition hover:bg-gray-100" onClick={() => setOpen(false)}>
               {l.label}
             </Link>
           ))}
-          <div className="flex gap-2 mt-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             <WhatsAppButton />
             <CallButton />
           </div>

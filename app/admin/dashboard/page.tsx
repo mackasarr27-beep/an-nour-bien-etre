@@ -1,94 +1,99 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useAuth from "../../../hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { collection, getCountFromServer } from "firebase/firestore";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminHeader from "../../../components/AdminHeader";
 import DashboardCard from "../../../components/DashboardCard";
-import SearchBar from "../../../components/SearchBar";
-import StatisticsChart from "../../../components/StatisticsChart";
-import ProductTable from "../../../components/ProductTable";
-import OrdersTable from "../../../components/OrdersTable";
-import AppointmentTable from "../../../components/AppointmentTable";
+import AdminProductManager from "../../../components/AdminProductManager";
+import CategoryManager from "../../../components/CategoryManager";
+import AppointmentAdminBoard from "../../../components/AppointmentAdminBoard";
+import MessageAdminBoard from "../../../components/MessageAdminBoard";
 import CustomerTable from "../../../components/CustomerTable";
-import { signOutSecure } from "../../../lib/firebase-auth";
+import { db } from "../../../lib/firebase";
+
+type DashboardStat = { title: string; value: number; description: string };
 
 export default function AdminDashboard() {
   const { user, profile, loading } = useAuth();
   const router = useRouter();
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [stats, setStats] = useState<DashboardStat[]>([
+    { title: "Produits", value: 0, description: "Produits disponibles" },
+    { title: "Commandes", value: 0, description: "Commandes enregistrées" },
+    { title: "Rendez-vous", value: 0, description: "Réservations actives" },
+    { title: "Messages", value: 0, description: "Demandes reçues" },
+  ]);
 
-  if (loading) return <div className="p-8">Chargement...</div>;
-  if (!user) {
-    if (typeof window !== "undefined") router.push("/login");
-    return <div className="p-8">Redirection...</div>;
-  }
-  if (profile?.role !== "admin") {
-    return <div className="p-8">Accès refusé. Vous n'avez pas les droits d'administrateur.</div>;
+  useEffect(() => {
+    if (!loading && (!user || profile?.role !== "admin")) {
+      router.replace("/admin");
+    }
+  }, [loading, profile?.role, router, user]);
+
+  useEffect(() => {
+    if (!user || profile?.role !== "admin") return;
+
+    const loadStats = async () => {
+      const [productsSnap, appointmentsSnap, messagesSnap, ordersSnap, clientsSnap] = await Promise.all([
+        getCountFromServer(collection(db, "products")),
+        getCountFromServer(collection(db, "appointments")),
+        getCountFromServer(collection(db, "messages")),
+        getCountFromServer(collection(db, "orders")),
+        getCountFromServer(collection(db, "clients")),
+      ]);
+
+      setStats([
+        { title: "Produits", value: productsSnap.data().count, description: "Produits disponibles" },
+        { title: "Commandes", value: ordersSnap.data().count, description: "Commandes enregistrées" },
+        { title: "Rendez-vous", value: appointmentsSnap.data().count, description: "Réservations actives" },
+        { title: "Messages", value: messagesSnap.data().count, description: "Demandes reçues" },
+        { title: "Clients", value: clientsSnap.data().count, description: "Clients enregistrés" },
+      ]);
+    };
+
+    void loadStats();
+  }, [profile?.role, user]);
+
+  if (loading) {
+    return <div className="p-8 text-sm text-gray-500">Chargement du tableau de bord...</div>;
   }
 
-  const stats = useMemo(
-    () => [
-      { title: "Produits", value: 48, description: "Total des produits" },
-      { title: "Commandes", value: 128, description: "Commandes en cours" },
-      { title: "Rendez-vous", value: 24, description: "Réservations à venir" },
-      { title: "Clients", value: 92, description: "Clients actifs" },
-    ],
-    []
-  );
+  if (!user || profile?.role !== "admin") {
+    return <div className="p-8 text-sm text-gray-500">Accès réservé à l’administrateur.</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="flex flex-col lg:flex-row">
         <AdminSidebar />
         <main className="flex-1 p-4 lg:p-8">
           <AdminHeader />
-          <section className="mt-6 space-y-4">
-            <div className="grid grid-cols-1 xl:grid-cols-[1.5fr_1fr] gap-6">
-              <div className="space-y-4">
-                <div className="rounded-3xl bg-white dark:bg-gray-950 p-6 shadow-sm">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold">Bienvenu, administrateur</h2>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Surveillez l'activité et gérez votre plateforme.</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button className="rounded-full border border-gray-200 dark:border-gray-800 px-4 py-2">Filtres</button>
-                      <button className="rounded-full bg-green-600 px-4 py-2 text-white">Nouvelle catégorie</button>
-                    </div>
-                  </div>
+          <section className="mt-6 space-y-6">
+            <div className="rounded-[32px] border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-600">Administration</p>
+                  <h2 className="mt-2 text-2xl font-semibold">Bienvenue dans votre espace de gestion</h2>
+                  <p className="mt-2 text-sm text-gray-500">Gérez la boutique, les rendez-vous, les messages et les clients depuis un seul tableau de bord.</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-4">
-                  {stats.map((item) => (
-                    <DashboardCard key={item.title} title={item.title} value={item.value} description={item.description} />
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-3xl bg-white dark:bg-gray-950 p-6 shadow-sm">
-                <SearchBar value={search} onChange={setSearch} />
-                <div className="mt-4 flex flex-wrap gap-2 text-sm text-gray-500 dark:text-gray-400">
-                  {['all','produits','commandes','rendez-vous','clients'].map((option) => (
-                    <button key={option} onClick={() => setFilter(option)} className={`rounded-full px-3 py-2 ${filter === option ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}>
-                      {option === 'all' ? 'Tous' : option}
-                    </button>
-                  ))}
+                <div className="rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+                  Connecté en tant qu’administrateur
                 </div>
               </div>
             </div>
-            <div className="grid gap-6">
-              <StatisticsChart />
-              <div className="rounded-3xl bg-white dark:bg-gray-950 p-6 shadow-sm">
-                <div className="grid gap-6 xl:grid-cols-2">
-                  <ProductTable />
-                  <OrdersTable />
-                </div>
-              </div>
-              <div className="grid gap-6 xl:grid-cols-2">
-                <AppointmentTable />
-                <CustomerTable />
-              </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+              {stats.map((item) => (
+                <DashboardCard key={item.title} title={item.title} value={item.value} description={item.description} />
+              ))}
             </div>
+
+            <AdminProductManager />
+            <CategoryManager />
+            <AppointmentAdminBoard />
+            <MessageAdminBoard />
+            <CustomerTable />
           </section>
         </main>
       </div>

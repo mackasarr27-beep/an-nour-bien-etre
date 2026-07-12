@@ -5,8 +5,8 @@ import React from "react";
 const sections = [
   { href: "/admin/dashboard", label: "Tableau de bord" },
   { href: "/admin/products", label: "Produits" },
-  { href: "/admin/orders", label: "Commandes" },
   { href: "/admin/appointments", label: "Rendez-vous" },
+  { href: "/admin/messages", label: "Messages" },
   { href: "/admin/customers", label: "Clients" },
 ];
 
