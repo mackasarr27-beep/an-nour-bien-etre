@@ -49,6 +49,7 @@ export default function Navbar() {
           <div className="hidden items-center gap-3 md:flex">
             <a href="/search" className="rounded px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Recherche</a>
             <a href="/cart" className="rounded px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Panier</a>
+            <Link href="/account" className="rounded px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Mon compte</Link>
             <WhatsAppButton />
             <CallButton />
           </div>
@@ -86,6 +87,9 @@ export default function Navbar() {
             </Link>
           )}
           <div className="mt-2 flex flex-wrap gap-2">
+            <Link href="/account" className="rounded-full bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900" onClick={() => setOpen(false)}>
+              Mon compte
+            </Link>
             <WhatsAppButton />
             <CallButton />
           </div>
