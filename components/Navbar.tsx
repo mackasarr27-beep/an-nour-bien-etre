@@ -20,7 +20,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/85 backdrop-blur-xl dark:bg-black/80">
+    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl dark:bg-black/95">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
@@ -59,16 +59,16 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className={`fixed inset-0 z-30 bg-black/20 backdrop-blur-sm transition-opacity duration-300 md:hidden ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setOpen(false)} />
+      <div className={`fixed inset-0 z-30 bg-black/70 backdrop-blur-sm transition-opacity duration-300 md:hidden ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setOpen(false)} />
 
-      <div className={`fixed inset-x-3 top-16 z-40 mx-auto max-w-2xl rounded-2xl border border-gray-200 bg-white/95 p-4 shadow-2xl transition-all duration-300 md:hidden ${open ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"}`}>
+      <div className={`fixed inset-x-3 top-16 z-40 mx-auto max-w-2xl rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl transition-all duration-300 md:hidden dark:border-gray-700 dark:bg-gray-900 ${open ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"}`}>
         <div className="flex items-center justify-between">
-          <span className="font-semibold">Navigation</span>
-          <button className="rounded-full p-2 hover:bg-gray-100" onClick={() => setOpen(false)} aria-label="Fermer le menu">✕</button>
+          <span className="font-semibold text-gray-900 dark:text-white">Navigation</span>
+          <button className="rounded-full bg-gray-100 p-2 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700" onClick={() => setOpen(false)} aria-label="Fermer le menu">✕</button>
         </div>
         <div className="mt-4 flex flex-col gap-2">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="rounded-xl px-3 py-3 transition hover:bg-gray-100" onClick={() => setOpen(false)}>
+            <Link key={l.href} href={l.href} className="rounded-xl px-3 py-3 text-gray-900 transition hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800" onClick={() => setOpen(false)}>
               {l.label}
             </Link>
           ))}
