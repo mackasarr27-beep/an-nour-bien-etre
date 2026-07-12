@@ -6,7 +6,7 @@ import React from "react";
 export default function HeroBanner() {
   return (
     <section className="w-full overflow-hidden">
-      <div className="relative isolate h-[72svh] min-h-[420px] sm:h-[82svh] sm:min-h-[560px] lg:min-h-[680px]">
+      <div className="relative isolate h-[76svh] min-h-[460px] sm:h-[82svh] sm:min-h-[560px] lg:min-h-[680px]">
         <Image
           src="/Bannière.png"
           alt="Bannière An Nour"
@@ -14,7 +14,7 @@ export default function HeroBanner() {
           priority
           quality={100}
           sizes="100vw"
-          className="h-full w-full object-cover sm:object-contain"
+          className="h-full w-full object-contain object-center sm:object-contain"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-center px-3 pb-3 sm:px-4 sm:pb-8 lg:pb-12">
