@@ -33,12 +33,13 @@ export default function CheckoutForm() {
         status: "pending",
         createdAt: serverTimestamp(),
       };
-      await addDoc(collection(db, "orders"), order as any);
-      await addDoc(collection(db, "clients"), { name, phone, email, address, createdAt: serverTimestamp() } as any);
+      await addDoc(collection(db, "orders"), order);
+      await addDoc(collection(db, "clients"), { name, phone, email, address, createdAt: serverTimestamp() });
       clear();
       router.push("/shop");
-    } catch (err: any) {
-      setError(err?.message || "Erreur lors de la commande");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur lors de la commande";
+      setError(message);
     } finally {
       setLoading(false);
     }

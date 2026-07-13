@@ -4,16 +4,27 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 export default function AppointmentTable() {
-  const [appointments, setAppointments] = useState<any[]>([]);
+  type AppointmentRow = {
+    id: string;
+    name: string;
+    date: string;
+    time: string;
+    service: string;
+  };
+
+  const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    const fetchAppointments = async () => {
       const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
-      setAppointments(snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as any) })));
+      setAppointments(
+        snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<AppointmentRow, "id">) })) as AppointmentRow[]
+      );
       setLoading(false);
-    })();
+    };
+    void fetchAppointments();
   }, []);
 
   return (

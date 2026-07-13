@@ -22,7 +22,7 @@ export default function PaymentSelector({ value, onChange }: { value: PaymentMet
         <div className="text-xs text-gray-500">Interface CB (non connectée)</div>
       </label>
       <label className={`p-3 border rounded cursor-pointer ${value === "cod" ? "ring-2 ring-green-400" : ""}`}>
-        <input className="hidden" type="radio" name="payment" checked={value === "cod"} onChange={() => onChange("cod" as any)} />
+        <input className="hidden" type="radio" name="payment" checked={value === "cod"} onChange={() => onChange("cod")} />
         <div className="font-medium">Paiement à la livraison</div>
         <div className="text-xs text-gray-500">Payer lors de la réception</div>
       </label>

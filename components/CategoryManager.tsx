@@ -20,7 +20,10 @@ export default function CategoryManager({ onChange }: CategoryManagerProps) {
   };
 
   useEffect(() => {
-    loadCategories();
+    const fetchCategories = async () => {
+      await loadCategories();
+    };
+    void fetchCategories();
   }, []);
 
   const handleAdd = async (e: React.FormEvent) => {

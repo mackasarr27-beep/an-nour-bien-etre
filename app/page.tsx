@@ -21,7 +21,7 @@ export default function Home() {
         <section className="max-w-7xl mx-auto px-4 py-12">
           <SectionTitle title="Présentation du cabinet" subtitle="Notre approche" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-            <p className="text-gray-700 dark:text-gray-300">Notre cabinet propose des soins naturels et personnalisés, réalisés par des experts expérimentés. L'espace a été conçu pour offrir calme et confort pour une expérience premium.</p>
+            <p className="text-gray-700 dark:text-gray-300">Notre cabinet propose des soins naturels et personnalisés, réalisés par des experts expérimentés. L&apos;espace a été conçu pour offrir calme et confort pour une expérience premium.</p>
             <div className="w-full h-48 bg-gray-100 dark:bg-gray-800 rounded-lg animate-[fadeIn_600ms_ease]" />
           </div>
         </section>
