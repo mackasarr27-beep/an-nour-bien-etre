@@ -73,8 +73,9 @@ export default function AppointmentForm() {
       });
       setSuccess(true);
       setForm({ name: "", phone: "", email: "", date: "", time: "", service: SERVICES[0], message: "" });
-    } catch (err: any) {
-      setError(err?.message || "Erreur lors de la réservation.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur lors de la réservation.";
+      setError(message);
     } finally {
       setLoading(false);
     }

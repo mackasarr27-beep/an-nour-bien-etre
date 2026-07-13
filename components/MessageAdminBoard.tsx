@@ -3,17 +3,27 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
+type Message = {
+  id: string;
+  name?: string;
+  email?: string;
+  message?: string;
+};
+
 export default function MessageAdminBoard() {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    const fetchMessages = async () => {
       const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
-      setMessages(snap.docs.map((item) => ({ id: item.id, ...(item.data() as any) })));
+      setMessages(
+        snap.docs.map((item) => ({ id: item.id, ...(item.data() as Omit<Message, "id">) })) as Message[]
+      );
       setLoading(false);
-    })();
+    };
+    void fetchMessages();
   }, []);
 
   return (

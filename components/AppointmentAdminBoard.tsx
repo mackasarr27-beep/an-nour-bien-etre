@@ -18,10 +18,23 @@ export default function AppointmentAdminBoard() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
+  type AppointmentDoc = {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    date: string;
+    time: string;
+    service: string;
+    status?: string;
+  };
+
   const loadAppointments = async () => {
     const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
     const snap = await getDocs(q);
-    setAppointments(snap.docs.map((item) => ({ id: item.id, ...(item.data() as any) })));
+    setAppointments(
+      snap.docs.map((item) => ({ id: item.id, ...(item.data() as Omit<AppointmentDoc, "id">) })) as AppointmentDoc[]
+    );
     setLoading(false);
   };
 

@@ -18,8 +18,9 @@ export default function LoginPage() {
     try {
       await signInWithFirebase(email, password);
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de la connexion");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur lors de la connexion";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -31,8 +32,9 @@ export default function LoginPage() {
     try {
       await signInWithGoogle();
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Connexion Google impossible");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Connexion Google impossible";
+      setError(message);
     } finally {
       setLoading(false);
     }

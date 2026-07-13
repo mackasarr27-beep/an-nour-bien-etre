@@ -8,7 +8,14 @@ import { useCart } from "../../../../components/CartContext";
 
 export default function ProductPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const [product, setProduct] = useState<any | null>(null);
+  type Product = {
+    id: string;
+    title: string;
+    description?: string;
+    price: number;
+    img?: string;
+  };
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { addItem } = useCart();
@@ -18,7 +25,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     (async () => {
       try {
         const d = await getDoc(doc(db, "products", id));
-        if (mounted) setProduct(d.exists() ? { id: d.id, ...(d.data() as any) } : null);
+        if (mounted) setProduct(d.exists() ? { id: d.id, ...(d.data() as Omit<Product, "id">) } : null);
       } catch (e) {
         console.error(e);
       } finally {

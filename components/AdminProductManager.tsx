@@ -18,7 +18,7 @@ export type AdminProduct = {
   featured: boolean;
   promotion: boolean;
   active: boolean;
-  createdAt?: any;
+  createdAt?: ReturnType<typeof serverTimestamp>;
 };
 
 const initialForm: AdminProduct = {
@@ -49,7 +49,7 @@ export default function AdminProductManager() {
   const loadProducts = async () => {
     const q = query(collection(db, "products"), orderBy("title"));
     const snap = await getDocs(q);
-    setProducts(snap.docs.map((item) => ({ id: item.id, ...(item.data() as any) })));
+    setProducts(snap.docs.map((item) => ({ id: item.id, ...(item.data() as Omit<AdminProduct, "id">) })));
     setLoading(false);
   };
 
@@ -60,8 +60,10 @@ export default function AdminProductManager() {
   };
 
   useEffect(() => {
-    void loadProducts();
-    void loadCategories();
+    const load = async () => {
+      await Promise.all([loadProducts(), loadCategories()]);
+    };
+    void load();
   }, []);
 
   const filteredProducts = useMemo(() => {

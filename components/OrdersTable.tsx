@@ -4,16 +4,27 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 export default function OrdersTable() {
-  const [orders, setOrders] = useState<any[]>([]);
+  type Order = {
+    id: string;
+    client?: { name?: string };
+    total?: number;
+    status?: string;
+    createdAt?: { toDate?: () => Date };
+  };
+
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    const fetchOrders = async () => {
       const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
-      setOrders(snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as any) })));
+      setOrders(
+        snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Order, "id">) })) as Order[]
+      );
       setLoading(false);
-    })();
+    };
+    void fetchOrders();
   }, []);
 
   return (

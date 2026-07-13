@@ -17,7 +17,7 @@ export default function ContactPage() {
       });
       setStatus("Votre message a bien été envoyé. Nous vous répondrons rapidement.");
       setForm({ name: "", email: "", phone: "", message: "" });
-    } catch (error) {
+    } catch {
       setStatus("Une erreur est survenue. Veuillez réessayer.");
     }
   };

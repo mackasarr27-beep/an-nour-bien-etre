@@ -26,8 +26,9 @@ export default function AdminLoginPage() {
       const result = await signInWithFirebase(email, password);
       const isAdmin = ADMIN_EMAILS.includes((result.user.email || "").toLowerCase());
       router.replace(isAdmin ? "/admin/dashboard" : "/");
-    } catch (err: any) {
-      setError(err.message || "Connexion impossible");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Connexion impossible";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -40,8 +41,9 @@ export default function AdminLoginPage() {
       const result = await registerWithFirebase(email, password);
       const isAdmin = ADMIN_EMAILS.includes((result.user.email || "").toLowerCase());
       router.replace(isAdmin ? "/admin/dashboard" : "/");
-    } catch (err: any) {
-      setError(err.message || "Création du compte impossible");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Création du compte impossible";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -54,8 +56,9 @@ export default function AdminLoginPage() {
       const result = await signInWithGoogle();
       const isAdmin = ADMIN_EMAILS.includes((result.user.email || "").toLowerCase());
       router.replace(isAdmin ? "/admin/dashboard" : "/");
-    } catch (err: any) {
-      setError(err.message || "Connexion Google impossible");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Connexion Google impossible";
+      setError(message);
     } finally {
       setLoading(false);
     }

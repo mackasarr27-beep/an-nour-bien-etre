@@ -5,18 +5,28 @@ import { db } from "../lib/firebase";
 import ConfirmDialog from "./ConfirmDialog";
 
 export default function ProductTable() {
-  const [products, setProducts] = useState<any[]>([]);
+  type ProductRow = {
+    id: string;
+    title?: string;
+    category?: string;
+    price?: number;
+  };
+
+  const [products, setProducts] = useState<ProductRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    const fetchProducts = async () => {
       const q = query(collection(db, "products"), orderBy("title"));
       const snap = await getDocs(q);
-      setProducts(snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as any) })));
+      setProducts(
+        snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<ProductRow, "id">) })) as ProductRow[]
+      );
       setLoading(false);
-    })();
+    };
+    void fetchProducts();
   }, []);
 
   const handleDelete = async () => {

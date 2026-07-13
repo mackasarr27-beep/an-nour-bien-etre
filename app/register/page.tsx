@@ -17,8 +17,9 @@ export default function RegisterPage() {
     try {
       await registerWithFirebase(email, password);
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de l'inscription");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur lors de l'inscription";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -30,8 +31,9 @@ export default function RegisterPage() {
     try {
       await signInWithGoogle();
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Connexion Google impossible");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Connexion Google impossible";
+      setError(message);
     } finally {
       setLoading(false);
     }

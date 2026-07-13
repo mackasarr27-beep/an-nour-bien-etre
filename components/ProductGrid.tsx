@@ -15,17 +15,18 @@ export default function ProductGrid() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+    const fetchProducts = async () => {
       try {
         const snap = await getDocs(collection(db, "products"));
-        const data = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+        const data = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }));
         if (mounted) setItems(data as Product[]);
       } catch (e) {
         console.error(e);
       } finally {
         if (mounted) setLoading(false);
       }
-    })();
+    };
+    void fetchProducts();
     return () => { mounted = false; };
   }, []);
 
