@@ -1,18 +1,15 @@
 import type { FirebaseOptions } from "firebase/app";
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
+import { getAuth, type Auth } from "firebase/auth";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 function requireEnv(name: string) {
-  const value = process.env[name]?.trim();
+  const value = process.env[name]?.trim() ?? "";
   if (!value) {
-    const message = `Missing environment variable ${name}. Please define ${name} in .env.local for development and in Vercel environment variables for Preview/Production.`;
-    if (process.env.NODE_ENV === "production") {
-      throw new Error(message);
-    }
-    console.warn(message);
-    return "";
+    console.warn(
+      `Missing environment variable ${name}. Firebase services will be disabled until it is configured.`
+    );
   }
   return value;
 }
@@ -26,22 +23,33 @@ const firebaseConfig: FirebaseOptions = {
   appId: requireEnv("NEXT_PUBLIC_FIREBASE_APP_ID"),
 };
 
-if (process.env.NODE_ENV !== "production") {
-  console.debug("Firebase configuration loaded:", {
-    apiKey: Boolean(firebaseConfig.apiKey),
-    authDomain: firebaseConfig.authDomain,
-    projectId: firebaseConfig.projectId,
-    storageBucket: firebaseConfig.storageBucket,
-    messagingSenderId: firebaseConfig.messagingSenderId,
-    appId: firebaseConfig.appId,
-  });
+const requiredConfigKeys = [
+  "apiKey",
+  "authDomain",
+  "projectId",
+  "storageBucket",
+  "messagingSenderId",
+  "appId",
+] as const;
+
+const hasRequiredFirebaseConfig = requiredConfigKeys.every((key) => {
+  const value = firebaseConfig[key];
+  return typeof value === "string" && value.trim().length > 0;
+});
+
+let app: ReturnType<typeof initializeApp> | null = null;
+let db: ReturnType<typeof getFirestore> | null = null;
+let auth: Auth | null = null;
+let storage: FirebaseStorage | null = null;
+
+if (hasRequiredFirebaseConfig) {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  db = getFirestore(app);
+  auth = getAuth(app);
+  storage = getStorage(app);
+} else {
+  console.warn("Firebase services are unavailable because the required environment variables are not configured.");
 }
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
-
-export { db, auth, storage };
+export { db, auth, storage, hasRequiredFirebaseConfig };
 export default app;

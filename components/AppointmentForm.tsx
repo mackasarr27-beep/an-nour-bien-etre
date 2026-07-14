@@ -60,6 +60,10 @@ export default function AppointmentForm() {
     }
     setLoading(true);
     try {
+      if (!db) {
+        throw new Error("La réservation n’est pas disponible pour le moment.");
+      }
+
       await addDoc(collection(db, "appointments"), {
         name: form.name,
         phone: form.phone,

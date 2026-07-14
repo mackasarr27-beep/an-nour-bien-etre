@@ -27,8 +27,15 @@ function isAdminEmail(email?: string | null) {
   return Boolean(email && ADMIN_EMAILS.includes(email.toLowerCase()));
 }
 
+function getAuthOrThrow() {
+  if (!auth) {
+    throw new Error("Firebase Auth is not configured. Please check the Firebase environment variables.");
+  }
+  return auth;
+}
+
 export async function ensureUserProfile(user: User | null): Promise<AuthProfile | null> {
-  if (!user) return null;
+  if (!user || !db) return null;
 
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -59,28 +66,37 @@ export async function ensureUserProfile(user: User | null): Promise<AuthProfile 
 }
 
 export async function signInWithFirebase(email: string, password: string) {
-  const result = await signInWithEmailAndPassword(auth, email, password);
+  const authInstance = getAuthOrThrow();
+  const result = await signInWithEmailAndPassword(authInstance, email, password);
   await ensureUserProfile(result.user);
   return result;
 }
 
 export async function registerWithFirebase(email: string, password: string) {
-  const result = await createUserWithEmailAndPassword(auth, email, password);
+  const authInstance = getAuthOrThrow();
+  const result = await createUserWithEmailAndPassword(authInstance, email, password);
   await ensureUserProfile(result.user);
   return result;
 }
 
 export async function signInWithGoogle() {
-  const result = await signInWithPopup(auth, googleProvider);
+  const authInstance = getAuthOrThrow();
+  const result = await signInWithPopup(authInstance, googleProvider);
   await ensureUserProfile(result.user);
   return result;
 }
 
 export async function signOutSecure() {
-  await signOut(auth);
+  const authInstance = getAuthOrThrow();
+  await signOut(authInstance);
 }
 
 export function listenToAuthState(callback: (user: User | null, profile: AuthProfile | null) => void) {
+  if (!auth) {
+    callback(null, null);
+    return () => undefined;
+  }
+
   return onAuthStateChanged(auth, async (user) => {
     const profile = await ensureUserProfile(user);
     callback(user, profile);

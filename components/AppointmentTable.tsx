@@ -17,6 +17,12 @@ export default function AppointmentTable() {
 
   useEffect(() => {
     const fetchAppointments = async () => {
+      if (!db) {
+        setAppointments([]);
+        setLoading(false);
+        return;
+      }
+
       const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
       setAppointments(

@@ -19,6 +19,12 @@ export default function ProductTable() {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      if (!db) {
+        setProducts([]);
+        setLoading(false);
+        return;
+      }
+
       const q = query(collection(db, "products"), orderBy("title"));
       const snap = await getDocs(q);
       setProducts(
@@ -30,7 +36,7 @@ export default function ProductTable() {
   }, []);
 
   const handleDelete = async () => {
-    if (!selectedId) return;
+    if (!selectedId || !db) return;
     await deleteDoc(doc(db, "products", selectedId));
     setProducts((current) => current.filter((product) => product.id !== selectedId));
     setConfirmOpen(false);

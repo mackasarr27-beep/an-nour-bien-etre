@@ -34,22 +34,29 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!user || profile?.role !== "admin") return;
 
-    const loadStats = async () => {
-      const [productsSnap, appointmentsSnap, messagesSnap, ordersSnap, clientsSnap] = await Promise.all([
-        getCountFromServer(collection(db, "products")),
-        getCountFromServer(collection(db, "appointments")),
-        getCountFromServer(collection(db, "messages")),
-        getCountFromServer(collection(db, "orders")),
-        getCountFromServer(collection(db, "clients")),
-      ]);
+    const firestoreDb = db;
+    if (!firestoreDb) return;
 
-      setStats([
-        { title: "Produits", value: productsSnap.data().count, description: "Produits disponibles" },
-        { title: "Commandes", value: ordersSnap.data().count, description: "Commandes enregistrées" },
-        { title: "Rendez-vous", value: appointmentsSnap.data().count, description: "Réservations actives" },
-        { title: "Messages", value: messagesSnap.data().count, description: "Demandes reçues" },
-        { title: "Clients", value: clientsSnap.data().count, description: "Clients enregistrés" },
-      ]);
+    const loadStats = async () => {
+      try {
+        const [productsSnap, appointmentsSnap, messagesSnap, ordersSnap, clientsSnap] = await Promise.all([
+          getCountFromServer(collection(firestoreDb, "products")),
+          getCountFromServer(collection(firestoreDb, "appointments")),
+          getCountFromServer(collection(firestoreDb, "messages")),
+          getCountFromServer(collection(firestoreDb, "orders")),
+          getCountFromServer(collection(firestoreDb, "clients")),
+        ]);
+
+        setStats([
+          { title: "Produits", value: productsSnap.data().count, description: "Produits disponibles" },
+          { title: "Commandes", value: ordersSnap.data().count, description: "Commandes enregistrées" },
+          { title: "Rendez-vous", value: appointmentsSnap.data().count, description: "Réservations actives" },
+          { title: "Messages", value: messagesSnap.data().count, description: "Demandes reçues" },
+          { title: "Clients", value: clientsSnap.data().count, description: "Clients enregistrés" },
+        ]);
+      } catch (error) {
+        console.error("Unable to load dashboard stats", error);
+      }
     };
 
     void loadStats();

@@ -16,6 +16,12 @@ export default function MessageAdminBoard() {
 
   useEffect(() => {
     const fetchMessages = async () => {
+      if (!db) {
+        setMessages([]);
+        setLoading(false);
+        return;
+      }
+
       const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
       setMessages(

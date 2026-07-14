@@ -47,6 +47,12 @@ export default function AdminProductManager() {
   const [uploading, setUploading] = useState(false);
 
   const loadProducts = async () => {
+    if (!db) {
+      setProducts([]);
+      setLoading(false);
+      return;
+    }
+
     const q = query(collection(db, "products"), orderBy("title"));
     const snap = await getDocs(q);
     setProducts(snap.docs.map((item) => ({ id: item.id, ...(item.data() as Omit<AdminProduct, "id">) })));
@@ -54,6 +60,11 @@ export default function AdminProductManager() {
   };
 
   const loadCategories = async () => {
+    if (!db) {
+      setCategories([]);
+      return;
+    }
+
     const q = query(collection(db, "categories"), orderBy("name"));
     const snap = await getDocs(q);
     setCategories(snap.docs.map((item) => item.data().name as string));
@@ -76,6 +87,8 @@ export default function AdminProductManager() {
 
   const uploadFiles = async (files: FileList | null) => {
     if (!files?.length) return [];
+    if (!storage) return [];
+
     const urls: string[] = [];
     for (const file of Array.from(files)) {
       const storageRef = ref(storage, `products/${Date.now()}-${file.name}`);
@@ -99,6 +112,10 @@ export default function AdminProductManager() {
         createdAt: serverTimestamp(),
       };
 
+      if (!db) {
+        throw new Error("La base de données n’est pas configurée.");
+      }
+
       if (editingId) {
         await updateDoc(doc(db, "products", editingId), payload);
       } else {
@@ -120,7 +137,7 @@ export default function AdminProductManager() {
   };
 
   const handleDelete = async (id?: string) => {
-    if (!id) return;
+    if (!id || !db) return;
     await deleteDoc(doc(db, "products", id));
     await loadProducts();
   };

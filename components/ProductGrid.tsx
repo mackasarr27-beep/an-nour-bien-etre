@@ -17,6 +17,11 @@ export default function ProductGrid() {
     let mounted = true;
     const fetchProducts = async () => {
       try {
+        if (!db) {
+          if (mounted) setItems([]);
+          return;
+        }
+
         const snap = await getDocs(collection(db, "products"));
         const data = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }));
         if (mounted) setItems(data as Product[]);

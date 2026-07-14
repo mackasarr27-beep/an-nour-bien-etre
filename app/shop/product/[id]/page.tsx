@@ -24,6 +24,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     let mounted = true;
     (async () => {
       try {
+        if (!db) {
+          if (mounted) setProduct(null);
+          return;
+        }
+
         const d = await getDoc(doc(db, "products", id));
         if (mounted) setProduct(d.exists() ? { id: d.id, ...(d.data() as Omit<Product, "id">) } : null);
       } catch (e) {

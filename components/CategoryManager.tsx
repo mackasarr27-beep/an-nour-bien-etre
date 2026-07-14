@@ -13,6 +13,12 @@ export default function CategoryManager({ onChange }: CategoryManagerProps) {
   const [name, setName] = useState("");
 
   const loadCategories = async () => {
+    if (!db) {
+      setCategories([]);
+      setLoading(false);
+      return;
+    }
+
     const q = query(collection(db, "categories"), orderBy("name"));
     const snap = await getDocs(q);
     setCategories(snap.docs.map((item) => item.data().name as string));
@@ -28,7 +34,7 @@ export default function CategoryManager({ onChange }: CategoryManagerProps) {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || !db) return;
     const value = name.trim();
     await addDoc(collection(db, "categories"), { name: value, createdAt: Date.now() });
     setName("");
@@ -37,6 +43,7 @@ export default function CategoryManager({ onChange }: CategoryManagerProps) {
   };
 
   const handleDelete = async (categoryName: string) => {
+    if (!db) return;
     const snap = await getDocs(query(collection(db, "categories"), orderBy("name")));
     const match = snap.docs.find((item) => item.data().name === categoryName);
     if (!match) return;

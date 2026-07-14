@@ -30,6 +30,12 @@ export default function AppointmentAdminBoard() {
   };
 
   const loadAppointments = async () => {
+    if (!db) {
+      setAppointments([]);
+      setLoading(false);
+      return;
+    }
+
     const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
     const snap = await getDocs(q);
     setAppointments(
@@ -43,6 +49,7 @@ export default function AppointmentAdminBoard() {
   }, []);
 
   const updateStatus = async (id: string, status: string) => {
+    if (!db) return;
     await updateDoc(doc(db, "appointments", id), { status });
     await loadAppointments();
   };

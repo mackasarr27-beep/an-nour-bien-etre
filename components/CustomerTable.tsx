@@ -16,6 +16,12 @@ export default function CustomerTable() {
 
   useEffect(() => {
     const fetchCustomers = async () => {
+      if (!db) {
+        setCustomers([]);
+        setLoading(false);
+        return;
+      }
+
       const q = query(collection(db, "clients"), orderBy("name"));
       const snap = await getDocs(q);
       setCustomers(

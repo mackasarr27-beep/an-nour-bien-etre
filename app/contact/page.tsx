@@ -11,6 +11,11 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!db) {
+        setStatus("La messagerie n’est pas disponible pour le moment.");
+        return;
+      }
+
       await addDoc(collection(db, "messages"), {
         ...form,
         createdAt: serverTimestamp(),

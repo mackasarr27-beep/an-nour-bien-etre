@@ -25,6 +25,10 @@ export default function CheckoutForm() {
     if (!name || !phone || !email) return setError("Veuillez remplir les informations client");
     setLoading(true);
     try {
+      if (!db) {
+        throw new Error("Le paiement n’est pas disponible pour le moment.");
+      }
+
       const order = {
         items,
         total,

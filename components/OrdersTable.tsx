@@ -17,6 +17,12 @@ export default function OrdersTable() {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      if (!db) {
+        setOrders([]);
+        setLoading(false);
+        return;
+      }
+
       const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
       setOrders(
