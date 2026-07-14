@@ -7,9 +7,12 @@ import { getStorage } from "firebase/storage";
 function requireEnv(name: string) {
   const value = process.env[name]?.trim();
   if (!value) {
-    throw new Error(
-      `Missing environment variable ${name}. Please define ${name} in .env.local for development and in Vercel environment variables for Preview/Production.`
-    );
+    const message = `Missing environment variable ${name}. Please define ${name} in .env.local for development and in Vercel environment variables for Preview/Production.`;
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(message);
+    }
+    console.warn(message);
+    return "";
   }
   return value;
 }
