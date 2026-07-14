@@ -4,38 +4,23 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth, type Auth } from "firebase/auth";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
-function requireEnv(name: string) {
-  const value = process.env[name]?.trim() ?? "";
-  if (!value) {
-    console.warn(
-      `Missing environment variable ${name}. Firebase services will be disabled until it is configured.`
-    );
-  }
-  return value;
-}
-
 const firebaseConfig: FirebaseOptions = {
-  apiKey: requireEnv("NEXT_PUBLIC_FIREBASE_API_KEY"),
-  authDomain: requireEnv("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"),
-  projectId: requireEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
-  storageBucket: requireEnv("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"),
-  messagingSenderId: requireEnv("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"),
-  appId: requireEnv("NEXT_PUBLIC_FIREBASE_APP_ID"),
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "",
 };
 
-const requiredConfigKeys = [
-  "apiKey",
-  "authDomain",
-  "projectId",
-  "storageBucket",
-  "messagingSenderId",
-  "appId",
-] as const;
-
-const hasRequiredFirebaseConfig = requiredConfigKeys.every((key) => {
-  const value = firebaseConfig[key];
-  return typeof value === "string" && value.trim().length > 0;
-});
+const hasRequiredFirebaseConfig = Boolean(
+  firebaseConfig.apiKey &&
+    firebaseConfig.authDomain &&
+    firebaseConfig.projectId &&
+    firebaseConfig.storageBucket &&
+    firebaseConfig.messagingSenderId &&
+    firebaseConfig.appId
+);
 
 let app: ReturnType<typeof initializeApp> | null = null;
 let db: ReturnType<typeof getFirestore> | null = null;
