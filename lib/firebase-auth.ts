@@ -27,13 +27,6 @@ function isAdminEmail(email?: string | null) {
   return Boolean(email && ADMIN_EMAILS.includes(email.toLowerCase()));
 }
 
-function getAuthOrThrow() {
-  if (!auth) {
-    throw new Error("Firebase Auth is not configured. Please check the Firebase environment variables.");
-  }
-  return auth;
-}
-
 export async function ensureUserProfile(user: User | null): Promise<AuthProfile | null> {
   if (!user || !db) return null;
 
@@ -66,29 +59,35 @@ export async function ensureUserProfile(user: User | null): Promise<AuthProfile 
 }
 
 export async function signInWithFirebase(email: string, password: string) {
-  const authInstance = getAuthOrThrow();
-  const result = await signInWithEmailAndPassword(authInstance, email, password);
+  if (!auth) {
+    throw new Error("Authentication service is not available. Please try again later.");
+  }
+  const result = await signInWithEmailAndPassword(auth, email, password);
   await ensureUserProfile(result.user);
   return result;
 }
 
 export async function registerWithFirebase(email: string, password: string) {
-  const authInstance = getAuthOrThrow();
-  const result = await createUserWithEmailAndPassword(authInstance, email, password);
+  if (!auth) {
+    throw new Error("Authentication service is not available. Please try again later.");
+  }
+  const result = await createUserWithEmailAndPassword(auth, email, password);
   await ensureUserProfile(result.user);
   return result;
 }
 
 export async function signInWithGoogle() {
-  const authInstance = getAuthOrThrow();
-  const result = await signInWithPopup(authInstance, googleProvider);
+  if (!auth) {
+    throw new Error("Authentication service is not available. Please try again later.");
+  }
+  const result = await signInWithPopup(auth, googleProvider);
   await ensureUserProfile(result.user);
   return result;
 }
 
 export async function signOutSecure() {
-  const authInstance = getAuthOrThrow();
-  await signOut(authInstance);
+  if (!auth) return;
+  await signOut(auth);
 }
 
 export function listenToAuthState(callback: (user: User | null, profile: AuthProfile | null) => void) {
