@@ -12,14 +12,14 @@ const sections = [
 
 export default function AdminSidebar() {
   return (
-    <aside className="w-full lg:w-72 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 shadow-sm">
+    <aside className="w-full border-r border-emerald-900/10 bg-white/90 p-4 shadow-sm backdrop-blur-sm lg:w-72">
       <div className="mb-6">
-        <div className="text-lg font-semibold">Admin</div>
-        <div className="text-sm text-gray-500">Tableau de bord premium</div>
+        <div className="text-lg font-semibold text-emerald-950">Admin</div>
+        <div className="text-sm text-slate-600">Tableau de bord premium</div>
       </div>
       <nav className="space-y-2">
         {sections.map((section) => (
-          <Link key={section.href} href={section.href} className="block rounded px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+          <Link key={section.href} href={section.href} className="block rounded-xl px-3 py-3 font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
             {section.label}
           </Link>
         ))}

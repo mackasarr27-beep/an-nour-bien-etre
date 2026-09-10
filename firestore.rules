@@ -1,0 +1,136 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && request.auth.token.email in [
+          "mackasarr27@gmail.com",
+          "nouruah@gmail.com"
+        ];
+    }
+
+    function isOwner(userId) {
+      return signedIn() && userId == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read: if isAdmin() || isOwner(userId);
+
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && (
+          (isAdmin() && request.resource.data.role == "admin")
+          || (!isAdmin() && request.resource.data.role == "client")
+        );
+
+      allow update: if isAdmin()
+        || (
+          isOwner(userId)
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(["updatedAt"])
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    match /messages/{messageId} {
+      allow create: if request.resource.data.name is string
+        && request.resource.data.email is string
+        && request.resource.data.message is string
+        && request.resource.data.createdAt is timestamp
+        && (
+          !("uid" in request.resource.data)
+          || (signedIn() && request.resource.data.uid == request.auth.uid)
+        );
+
+      allow read: if isAdmin()
+        || (
+          signedIn()
+          && "uid" in resource.data
+          && resource.data.uid == request.auth.uid
+        );
+
+      allow update: if isAdmin()
+        || (
+          signedIn()
+          && "uid" in resource.data
+          && resource.data.uid == request.auth.uid
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.name == resource.data.name
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly([
+              "replies",
+              "status",
+              "readByClient",
+              "readByAdmin",
+              "updatedAt"
+            ])
+          && request.resource.data.readByClient == true
+          && (
+            request.resource.data.status == resource.data.status
+            || request.resource.data.status == "Non lu"
+          )
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    match /appointments/{appointmentId} {
+      allow create: if request.resource.data.name is string
+        && request.resource.data.phone is string
+        && request.resource.data.email is string
+        && request.resource.data.date is string
+        && request.resource.data.time is string
+        && request.resource.data.service is string
+        && request.resource.data.message is string
+        && request.resource.data.status == "pending"
+        && request.resource.data.createdAt is timestamp;
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow create: if request.resource.data.items is list
+        && request.resource.data.total is number
+        && request.resource.data.client is map
+        && request.resource.data.paymentMethod is string
+        && request.resource.data.status == "pending"
+        && request.resource.data.createdAt is timestamp;
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /clients/{clientId} {
+      allow create: if request.resource.data.name is string
+        && request.resource.data.phone is string
+        && request.resource.data.email is string
+        && request.resource.data.createdAt is timestamp;
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

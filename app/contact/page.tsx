@@ -3,8 +3,10 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import React, { useState } from "react";
 import SectionTitle from "../../components/SectionTitle";
 import { db } from "../../lib/firebase";
+import useAuth from "../../hooks/useAuth";
 
 export default function ContactPage() {
+  const { user } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [status, setStatus] = useState<string | null>(null);
 
@@ -18,6 +20,12 @@ export default function ContactPage() {
 
       await addDoc(collection(db, "messages"), {
         ...form,
+        ...(user?.uid ? { uid: user.uid } : {}),
+        status: "Non lu",
+        readByClient: true,
+        readByAdmin: false,
+        replies: [],
+        updatedAt: serverTimestamp(),
         createdAt: serverTimestamp(),
       });
       setStatus("Votre message a bien été envoyé. Nous vous répondrons rapidement.");

@@ -8,7 +8,7 @@ import CTASection from "../components/CTASection";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-black">
+    <div className="flex min-h-screen flex-col bg-transparent">
       <Navbar />
       <main className="flex-1">
         <HeroBanner />
@@ -21,12 +21,12 @@ export default function Home() {
         <section className="max-w-7xl mx-auto px-4 py-12">
           <SectionTitle title="Présentation du cabinet" subtitle="Notre approche" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-            <p className="text-gray-700 dark:text-gray-300">Notre cabinet propose des soins naturels et personnalisés, réalisés par des experts expérimentés. L&apos;espace a été conçu pour offrir calme et confort pour une expérience premium.</p>
+            <p className="text-base leading-7 text-slate-800">Notre cabinet propose des soins naturels et personnalisés, réalisés par des experts expérimentés. L&apos;espace a été conçu pour offrir calme et confort pour une expérience premium.</p>
             <div className="w-full h-48 bg-gray-100 dark:bg-gray-800 rounded-lg animate-[fadeIn_600ms_ease]" />
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-4 py-12 bg-gray-50 dark:bg-gray-900 rounded-md">
+        <section className="mx-auto max-w-7xl rounded-[28px] border border-emerald-900/10 bg-white/45 px-4 py-12 shadow-[0_18px_50px_rgba(15,118,110,0.05)] backdrop-blur-sm">
           <SectionTitle title="Témoignages" subtitle="Ils ont testé nos soins" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <TestimonialCard name="Marie" quote="Un moment exceptionnel, je recommande !" />

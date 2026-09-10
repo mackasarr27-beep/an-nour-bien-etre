@@ -54,7 +54,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <div className="mt-4 font-semibold text-xl">{product.price?.toFixed ? product.price.toFixed(2) : product.price}</div>
           <div className="mt-6 flex gap-2">
             <button onClick={() => addItem({ id: product.id, title: product.title, price: product.price, img: product.img })} className="px-4 py-2 bg-green-600 text-white rounded">Ajouter au panier</button>
-            <button onClick={() => router.push('/shop')} className="px-4 py-2 border rounded">Retour</button>
+            <button onClick={() => router.push('/shop')} className="rounded-full border border-emerald-900/15 px-4 py-2 font-semibold text-slate-700 transition hover:bg-emerald-50">← Retour</button>
           </div>
         </div>
       </div>

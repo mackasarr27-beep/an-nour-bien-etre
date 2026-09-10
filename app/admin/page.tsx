@@ -65,8 +65,8 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
-      <div className="w-full max-w-md rounded-[28px] border border-gray-200 bg-white p-8 shadow-xl">
+    <div className="flex min-h-screen items-center justify-center bg-transparent px-4 py-10">
+      <div className="w-full max-w-md rounded-[28px] border border-emerald-900/10 bg-white/95 p-8 shadow-[0_24px_70px_rgba(15,118,110,0.14)]">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-600">Administration</p>
           <h1 className="mt-2 text-3xl font-semibold">Connexion sécurisée</h1>

@@ -18,7 +18,7 @@ export type AuthProfile = {
   role: UserRole;
 };
 
-export const ADMIN_EMAILS = ["mackasarr27@gmail.com"];
+export const ADMIN_EMAILS = ["mackasarr27@gmail.com", "nouruah@gmail.com"];
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });

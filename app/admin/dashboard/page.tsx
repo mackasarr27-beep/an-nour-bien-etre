@@ -71,13 +71,13 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-transparent text-slate-900">
       <div className="flex flex-col lg:flex-row">
         <AdminSidebar />
         <main className="flex-1 p-4 lg:p-8">
           <AdminHeader />
           <section className="mt-6 space-y-6">
-            <div className="rounded-[32px] border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-[32px] border border-emerald-900/10 bg-white/95 p-6 shadow-[0_20px_60px_rgba(15,118,110,0.08)]">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-600">Administration</p>

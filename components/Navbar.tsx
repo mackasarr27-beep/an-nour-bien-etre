@@ -23,41 +23,41 @@ export default function Navbar() {
   const isAdmin = !loading && profile?.role === "admin";
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl dark:bg-black/95">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Image src="/Bannière.png" alt="An Nour" width={48} height={48} className="rounded object-contain" />
-              <span className="font-semibold">AN NOUR</span>
+    <header className="sticky top-0 z-40 w-full border-b border-emerald-900/10 bg-[linear-gradient(100deg,rgba(255,255,255,0.96),rgba(236,250,246,0.92),rgba(244,248,255,0.94))] text-slate-800 shadow-[0_8px_30px_rgba(15,118,110,0.06)] backdrop-blur-xl">
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 2xl:px-8">
+        <div className="flex min-h-16 items-center gap-3 2xl:grid 2xl:grid-cols-[auto_1fr_auto] 2xl:gap-5">
+          <div className="flex shrink-0 items-center gap-3">
+            <Link href="/" className="flex shrink-0 items-center gap-2 whitespace-nowrap">
+              <Image src="/logo.png" alt="AN NOUR BIEN-ÊTRE" width={44} height={44} className="rounded object-contain" />
+              <span className="text-sm font-semibold tracking-wide text-emerald-950 2xl:text-base">AN NOUR</span>
             </Link>
           </div>
 
-          <nav className="hidden items-center gap-4 md:flex">
+          <nav className="hidden min-w-0 items-center justify-center gap-3 2xl:flex">
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className="text-sm transition hover:underline">
+              <Link key={l.href} href={l.href} className="shrink-0 whitespace-nowrap text-[13px] font-medium text-slate-700 transition hover:text-emerald-700">
                 {l.label}
               </Link>
             ))}
             {isAdmin && (
-              <Link href="/admin/dashboard" className="rounded-full bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500">
+                <Link href="/admin/dashboard" className="ml-1 shrink-0 whitespace-nowrap rounded-full bg-emerald-700 px-3 py-2 text-[13px] font-semibold text-white transition hover:bg-emerald-800">
                 Administration
               </Link>
             )}
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex">
-            <a href="/search" className="rounded px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Recherche</a>
-            <a href="/cart" className="rounded px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Panier</a>
-            <Link href="/account" className="rounded px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">Mon compte</Link>
+          <div className="hidden shrink-0 items-center justify-end gap-1 2xl:flex">
+            <a href="/search" className="whitespace-nowrap rounded-lg px-2 py-2 text-[13px] font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">Recherche</a>
+            <a href="/cart" className="whitespace-nowrap rounded-lg px-2 py-2 text-[13px] font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">Panier</a>
+            <Link href="/account" className="whitespace-nowrap rounded-lg px-2 py-2 text-[13px] font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">Mon compte</Link>
             <WhatsAppButton />
             <CallButton />
           </div>
 
-          <div className="flex items-center md:hidden">
+          <div className="ml-auto flex items-center 2xl:hidden">
             <button
               aria-label="Menu"
-              className="rounded-full border border-gray-200 bg-white/90 p-2 shadow-sm transition hover:scale-105 dark:border-gray-700 dark:bg-gray-900"
+              className="rounded-full border border-emerald-900/15 bg-white/80 p-2 shadow-sm transition hover:scale-105"
               onClick={() => setOpen((v) => !v)}
             >
               <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -68,16 +68,16 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className={`fixed inset-0 z-30 bg-black/70 backdrop-blur-sm transition-opacity duration-300 md:hidden ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setOpen(false)} />
+      <div className={`fixed inset-0 z-30 bg-black/70 backdrop-blur-sm transition-opacity duration-300 2xl:hidden ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setOpen(false)} />
 
-      <div className={`fixed inset-x-3 top-16 z-40 mx-auto max-w-2xl rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl transition-all duration-300 md:hidden dark:border-gray-700 dark:bg-gray-900 ${open ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"}`}>
+      <div className={`fixed inset-x-3 top-16 z-40 mx-auto max-w-2xl rounded-2xl border border-emerald-900/15 bg-white p-4 text-slate-900 shadow-2xl transition-all duration-300 2xl:hidden ${open ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"}`}>
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-gray-900 dark:text-white">Navigation</span>
-          <button className="rounded-full bg-gray-100 p-2 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700" onClick={() => setOpen(false)} aria-label="Fermer le menu">✕</button>
+          <span className="font-semibold text-slate-900">Navigation</span>
+          <button className="rounded-full border border-slate-200 bg-slate-100 p-2 text-slate-900 transition hover:bg-slate-200" onClick={() => setOpen(false)} aria-label="Fermer le menu">✕</button>
         </div>
         <div className="mt-4 flex flex-col gap-2">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="rounded-xl px-3 py-3 text-gray-900 transition hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800" onClick={() => setOpen(false)}>
+            <Link key={l.href} href={l.href} className="rounded-xl px-3 py-3 font-medium text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-800" onClick={() => setOpen(false)}>
               {l.label}
             </Link>
           ))}
@@ -87,7 +87,7 @@ export default function Navbar() {
             </Link>
           )}
           <div className="mt-2 flex flex-wrap gap-2">
-            <Link href="/account" className="rounded-full bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900" onClick={() => setOpen(false)}>
+            <Link href="/account" className="rounded-full border border-emerald-900/15 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900" onClick={() => setOpen(false)}>
               Mon compte
             </Link>
             <WhatsAppButton />

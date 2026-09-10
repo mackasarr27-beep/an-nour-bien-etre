@@ -22,9 +22,6 @@ const firebaseConfig: FirebaseOptions = {
   appId: rawFirebaseConfig.appId.trim(),
 };
 
-console.log("Firebase env raw:", rawFirebaseConfig);
-console.log("Firebase config trimmed:", firebaseConfig);
-
 const missingKeys = Object.entries(firebaseConfig)
   .filter(([, value]) => !value)
   .map(([key]) => key);
