@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -51,9 +51,18 @@ export default function HomeProductSections() {
     return () => { mounted = false; };
   }, []);
 
-  const popular = products.filter((product) => product.category && ["Huiles", "Compléments alimentaires", "Tisanes", "Produits de massage", "Cosmétiques", "Accessoires"].includes(product.category)).slice(0, 4);
-  const promotions = products.filter((product) => product.promotion || (typeof product.oldPrice === "number" && product.oldPrice > 0) || (typeof product.oldPrice === "string" && Number(product.oldPrice) > 0)).slice(0, 4);
-  const latest = products.slice(0, 4);
+  const sections = useMemo(() => {
+    const popular = products.filter((product) => product.category && ["Huiles", "Compléments alimentaires", "Tisanes", "Produits de massage", "Cosmétiques", "Accessoires"].includes(product.category)).slice(0, 6);
+    const promotions = products.filter((product) => product.promotion || (typeof product.oldPrice === "number" && product.oldPrice > 0) || (typeof product.oldPrice === "string" && Number(product.oldPrice) > 0)).slice(0, 6);
+    const latest = [...products].slice(-6).reverse();
+
+    return [
+      { title: "Nos produits", subtitle: "Sélection premium", items: products.slice(0, 8) },
+      { title: "Produits populaires", subtitle: "Les plus recherchés", items: popular },
+      { title: "Promotions", subtitle: "À saisir", items: promotions },
+      { title: "Nouveautés", subtitle: "Derniers arrivages", items: latest },
+    ].filter((section) => section.items.length > 0);
+  }, [products]);
 
   const renderSection = (title: string, subtitle: string, items: Product[]) => {
     if (!items.length) return null;
@@ -70,31 +79,33 @@ export default function HomeProductSections() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="flex gap-4 overflow-x-auto pb-3 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:pb-0 xl:grid-cols-4">
           {items.map((product) => {
             const productImage = getProductImage(product);
             return (
-              <div key={product.id} className="flex flex-col">
-                <ProductCard
-                  title={product.title}
-                  category={product.category}
-                  subtitle={product.subtitle || undefined}
-                  price={product.price}
-                  oldPrice={product.oldPrice}
-                  promotion={Boolean(product.promotion)}
-                  img={productImage}
-                  stock={typeof product.stock === "number" ? product.stock : undefined}
-                />
-                <div className="mt-3 flex gap-2">
-                  <Link href={`/shop/product/${product.id}`} className="flex-1 rounded-full border border-emerald-900/15 bg-white px-4 py-2 text-center text-sm font-semibold text-slate-700 transition hover:bg-emerald-50">
-                    Voir les détails
-                  </Link>
-                  <button
-                    onClick={() => addItem({ id: product.id, title: product.title, price: Number(product.price ?? 0), img: productImage })}
-                    className="flex-1 rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
-                  >
-                    Ajouter au panier
-                  </button>
+              <div key={product.id} className="min-w-[250px] flex-1 md:min-w-0">
+                <div className="flex h-full flex-col">
+                  <ProductCard
+                    title={product.title}
+                    category={product.category}
+                    subtitle={product.subtitle || undefined}
+                    price={product.price}
+                    oldPrice={product.oldPrice}
+                    promotion={Boolean(product.promotion)}
+                    img={productImage}
+                    stock={typeof product.stock === "number" ? product.stock : undefined}
+                  />
+                  <div className="mt-3 flex gap-2">
+                    <Link href={`/shop/product/${product.id}`} className="flex-1 rounded-full border border-emerald-900/15 bg-white px-4 py-2 text-center text-sm font-semibold text-slate-700 transition hover:bg-emerald-50">
+                      Voir les détails
+                    </Link>
+                    <button
+                      onClick={() => addItem({ id: product.id, title: product.title, price: Number(product.price ?? 0), img: productImage })}
+                      className="flex-1 rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                    >
+                      Ajouter
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -115,9 +126,7 @@ export default function HomeProductSections() {
         <h2 className="mt-1 text-2xl font-semibold text-slate-900">Nos produits</h2>
       </div>
 
-      {renderSection("Produits populaires", "PGA", popular)}
-      {renderSection("Promotions", "Économisez", promotions)}
-      {renderSection("Nouveautés", "Découvrir", latest)}
+      {sections.map((section) => renderSection(section.title, section.subtitle, section.items))}
     </div>
   );
 }
