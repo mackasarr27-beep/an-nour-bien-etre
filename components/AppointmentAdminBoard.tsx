@@ -9,6 +9,8 @@ type Appointment = {
   name: string;
   email: string;
   phone: string;
+  address?: string;
+  neighborhood?: string;
   date: string;
   time: string;
   service: string;
@@ -74,7 +76,11 @@ export default function AppointmentAdminBoard() {
               status: updatedAppointment.status,
             },
           }),
-        }).catch((emailError) => console.error("Appointment confirmation email failed", emailError));
+        }).then(async (response) => {
+          if (!response.ok) {
+            console.error("Appointment confirmation email failed", response.status, await response.text());
+          }
+        }).catch((emailError) => console.error("Appointment confirmation email request failed", emailError));
       }
     } catch {
       setFeedback({ type: "error", message: "Impossible de mettre à jour le statut. Veuillez réessayer." });
@@ -119,6 +125,7 @@ export default function AppointmentAdminBoard() {
               <col className="w-[12%]" />
               <col className="w-[10%]" />
               <col className="w-[16%]" />
+              <col className="w-[12%]" />
               <col className="w-[8%]" />
               <col className="w-[7%]" />
               <col className="w-[11%]" />
@@ -131,6 +138,7 @@ export default function AppointmentAdminBoard() {
                 <th className="py-3">Client</th>
                 <th className="py-3">Téléphone</th>
                 <th className="py-3">Email</th>
+                <th className="py-3">Adresse</th>
                 <th className="py-3">Date</th>
                 <th className="py-3">Heure</th>
                 <th className="py-3">Soin</th>
@@ -142,13 +150,14 @@ export default function AppointmentAdminBoard() {
             <tbody>
               {appointments.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-8 text-center text-slate-600">Aucun rendez-vous enregistré.</td>
+                  <td colSpan={10} className="py-8 text-center text-slate-600">Aucun rendez-vous enregistré.</td>
                 </tr>
               ) : appointments.map((appointment) => (
                 <tr key={appointment.id} className="border-b border-emerald-900/10 align-top text-slate-800">
                   <td className="break-words px-3 py-4 font-semibold first:pl-0">{appointment.name}</td>
                   <td className="whitespace-nowrap px-3 py-4">{appointment.phone}</td>
-                  <td className="break-words px-3 py-4">{appointment.email}</td>
+                  <td className="break-words px-3 py-4">{appointment.email || "Non renseigné"}</td>
+                  <td className="break-words px-3 py-4">{appointment.address || appointment.neighborhood || "Non renseignée"}</td>
                   <td className="whitespace-nowrap px-3 py-4">{appointment.date}</td>
                   <td className="whitespace-nowrap px-3 py-4">{appointment.time}</td>
                   <td className="break-words px-3 py-4">{appointment.service}</td>

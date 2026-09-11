@@ -81,6 +81,12 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          <Link href="/search" className="rounded-xl border border-emerald-900/15 bg-emerald-50 px-3 py-3 font-medium text-emerald-900 transition hover:bg-emerald-100" onClick={() => setOpen(false)}>
+            🔍 Recherche
+          </Link>
+          <Link href="/cart" className="rounded-xl border border-emerald-900/15 bg-emerald-50 px-3 py-3 font-medium text-emerald-900 transition hover:bg-emerald-100" onClick={() => setOpen(false)}>
+            🛒 Panier
+          </Link>
           {isAdmin && (
             <Link href="/admin/dashboard" className="rounded-xl bg-emerald-600 px-3 py-3 text-center font-semibold text-white" onClick={() => setOpen(false)}>
               Administration
