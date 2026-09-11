@@ -3,6 +3,7 @@ import Image from "next/image";
 
 type Props = {
   title: string;
+  category?: string;
   subtitle?: string;
   price?: number | string;
   img?: string;
@@ -23,7 +24,7 @@ function formatPrice(value: number | string | undefined) {
   return `${new Intl.NumberFormat("fr-FR").format(numericValue)} FCFA`;
 }
 
-export default function ProductCard({ title, subtitle, price, img, stock }: Props) {
+export default function ProductCard({ title, category, subtitle, price, img, stock }: Props) {
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-3xl border border-emerald-900/10 bg-white shadow-[0_18px_50px_rgba(15,118,110,0.06)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_24px_60px_rgba(15,118,110,0.10)]">
       {img ? (
@@ -38,6 +39,7 @@ export default function ProductCard({ title, subtitle, price, img, stock }: Prop
 
       <div className="flex flex-1 flex-col p-4">
         <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        {category ? <p className="mt-1 text-xs font-medium uppercase tracking-[0.12em] text-emerald-700">{category}</p> : null}
         {subtitle ? <p className="mt-1 text-sm text-slate-600">{subtitle}</p> : null}
 
         <div className="mt-3 flex items-center justify-between gap-2">

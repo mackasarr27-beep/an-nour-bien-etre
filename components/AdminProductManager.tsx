@@ -12,6 +12,7 @@ export type AdminProduct = {
   oldPrice?: number;
   description: string;
   subtitle?: string;
+  additionalInfo?: string;
   stock: number;
   images: string[];
   gallery: string[];
@@ -30,6 +31,7 @@ const initialForm: AdminProduct = {
   oldPrice: 0,
   description: "",
   subtitle: "",
+  additionalInfo: "",
   stock: 1,
   images: [],
   gallery: [],
@@ -109,6 +111,7 @@ export default function AdminProductManager() {
       const payload: AdminProduct = {
         ...form,
         subtitle: form.subtitle?.trim() || "",
+        additionalInfo: form.additionalInfo?.trim() || "",
         imageUrl: form.imageUrl?.trim() || "",
         price: Number(form.price || 0),
         oldPrice: Number(form.oldPrice || 0),
@@ -142,6 +145,7 @@ export default function AdminProductManager() {
     setForm({
       ...product,
       subtitle: product.subtitle || "",
+      additionalInfo: product.additionalInfo || "",
       imageUrl: product.imageUrl || "",
       images: product.images || [],
       gallery: product.gallery || [],
@@ -199,15 +203,23 @@ export default function AdminProductManager() {
                 <input type="number" value={form.oldPrice || 0} onChange={(e) => setForm({ ...form, oldPrice: Number(e.target.value) })} placeholder="Ancien prix" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
               </div>
             </div>
-            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" className="min-h-[120px] w-full rounded-2xl border border-gray-200 px-4 py-3" />
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+              <p className="mb-1 text-xs text-gray-500">Décrivez le produit, ses caractéristiques et ses informations importantes.</p>
+              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" className="min-h-[120px] w-full rounded-2xl border border-gray-200 px-4 py-3" />
+            </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Sous-titre du produit</label>
               <input value={form.subtitle || ""} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} placeholder="Sous-titre du produit" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
             </div>
             <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Informations complémentaires</label>
+              <textarea value={form.additionalInfo || ""} onChange={(e) => setForm({ ...form, additionalInfo: e.target.value })} placeholder="Informations complémentaires" className="min-h-[100px] w-full rounded-2xl border border-gray-200 px-4 py-3" />
+            </div>
+            <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Stock</label>
               <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} placeholder="Stock" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
-              <p className="mt-1 text-xs text-gray-500">Quantité disponible</p>
+              <p className="mt-1 text-xs text-gray-500">Quantité disponible en stock</p>
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">URL de l&apos;image principale</label>
@@ -230,12 +242,12 @@ export default function AdminProductManager() {
               Activer le produit
             </label>
             <label className="text-sm text-gray-600">
-              Images principales
-              <input type="file" multiple accept="image/*" onChange={(e) => void setFiles(e, "images")} className="mt-2 block w-full text-sm" />
+              Image principale du produit
+              <input type="file" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={(e) => void setFiles(e, "images")} className="mt-2 block w-full text-sm" />
             </label>
             <label className="text-sm text-gray-600">
-              Galerie
-              <input type="file" multiple accept="image/*" onChange={(e) => void setFiles(e, "gallery")} className="mt-2 block w-full text-sm" />
+              Galerie d&apos;images
+              <input type="file" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={(e) => void setFiles(e, "gallery")} className="mt-2 block w-full text-sm" />
             </label>
             <div className="rounded-2xl border border-dashed border-gray-200 p-4 text-sm text-gray-500">
               <div className="font-medium text-gray-700">URLs actuelles</div>

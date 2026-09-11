@@ -75,7 +75,8 @@ export default function Navbar() {
           <span className="font-semibold text-slate-900">Navigation</span>
           <button className="rounded-full border border-slate-200 bg-slate-100 p-2 text-slate-900 transition hover:bg-slate-200" onClick={() => setOpen(false)} aria-label="Fermer le menu">✕</button>
         </div>
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="mt-4 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div className="flex flex-col gap-2">
           {links.map((l) => (
             <Link key={l.href} href={l.href} className="rounded-xl px-3 py-3 font-medium text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-800" onClick={() => setOpen(false)}>
               {l.label}
@@ -103,6 +104,7 @@ export default function Navbar() {
             <div className="inline-flex items-center justify-center">
               <CallButton />
             </div>
+          </div>
           </div>
         </div>
       </div>

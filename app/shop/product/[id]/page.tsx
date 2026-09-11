@@ -11,7 +11,8 @@ type Product = {
   title: string;
   subtitle?: string;
   description?: string;
-  price: number;
+  additionalInfo?: string;
+  price?: number;
   stock?: number;
   img?: string;
   imageUrl?: string;
@@ -62,8 +63,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         const d = await getDoc(doc(db, "products", id));
         if (mounted) {
           if (d.exists()) {
-            const data = d.data() as Omit<Product, "id">;
-            const resolvedProduct = { id: d.id, ...data };
+            const data = d.data() as Omit<Product, "id" | "price"> & { price?: number | string };
+            const resolvedProduct: Product = {
+              id: d.id,
+              ...data,
+              price: Number(data.price ?? 0),
+            };
             setProduct(resolvedProduct);
             setSelectedImage(getPrimaryImage(resolvedProduct));
           } else {
@@ -136,7 +141,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
           <div className="space-y-3">
             <button
-              onClick={() => addItem({ id: product.id, title: product.title, price: product.price, img: primaryImage })}
+              onClick={() => addItem({ id: product.id, title: product.title, price: Number(product.price ?? 0), img: primaryImage })}
               className="w-full rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
             >
               Ajouter au panier
@@ -153,6 +158,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             <h2 className="text-lg font-semibold text-slate-900">Description</h2>
             <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">{product.description || "Aucune description disponible."}</p>
           </div>
+
+          {product.additionalInfo ? (
+            <div className="rounded-2xl border border-emerald-900/10 bg-white p-4">
+              <h2 className="text-lg font-semibold text-slate-900">Informations complémentaires</h2>
+              <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">{product.additionalInfo}</p>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

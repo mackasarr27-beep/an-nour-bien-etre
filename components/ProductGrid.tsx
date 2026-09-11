@@ -57,6 +57,7 @@ export default function ProductGrid() {
           <div key={p.id} className="flex flex-col">
             <ProductCard
               title={p.title}
+              category={p.category}
               subtitle={p.subtitle || undefined}
               price={p.price}
               img={productImage}

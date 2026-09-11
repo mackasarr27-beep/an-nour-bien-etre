@@ -14,11 +14,11 @@ Configure these variables in the Vercel project settings for the relevant enviro
 
 ```text
 RESEND_API_KEY=<server-only Resend key>
-ADMIN_EMAIL=<real cabinet administrator recipient>
-FROM_EMAIL=<sender address verified in Resend>
+ADMIN_EMAIL=cstvsenegal@gmail.com
+RESEND_FROM_EMAIL=<sender address verified in Resend>
 ```
 
-Never prefix `RESEND_API_KEY` with `NEXT_PUBLIC_` and never commit its value. `FROM_EMAIL` must be a Resend-verified sender; the project does not invent or assume a custom domain.
+Never prefix `RESEND_API_KEY` with `NEXT_PUBLIC_` and never commit its value. `RESEND_FROM_EMAIL` (or the legacy `FROM_EMAIL`) must be a Resend-verified sender; the project does not invent or assume a custom domain.
 
 The appointment form writes the existing `appointments` document with `status: "pending"`, then calls the server route to notify `ADMIN_EMAIL`. When the admin changes the status to `Confirmé`, the admin UI calls the same server route to notify the client's stored `email`.
 
