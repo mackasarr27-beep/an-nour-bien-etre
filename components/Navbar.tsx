@@ -92,12 +92,17 @@ export default function Navbar() {
               Administration
             </Link>
           )}
-          <div className="mt-2 flex flex-wrap gap-2">
-            <Link href="/account" className="rounded-full border border-emerald-900/15 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900" onClick={() => setOpen(false)}>
+          <div className="mt-2 grid gap-2 sm:grid-cols-3">
+            <Link href="/account" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-900/15 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900" onClick={() => setOpen(false)}>
+              <span aria-hidden="true">👤</span>
               Mon compte
             </Link>
-            <WhatsAppButton />
-            <CallButton />
+            <div className="inline-flex items-center justify-center">
+              <WhatsAppButton />
+            </div>
+            <div className="inline-flex items-center justify-center">
+              <CallButton />
+            </div>
           </div>
         </div>
       </div>

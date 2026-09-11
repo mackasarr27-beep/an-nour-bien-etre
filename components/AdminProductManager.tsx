@@ -11,9 +11,11 @@ export type AdminProduct = {
   price: number;
   oldPrice?: number;
   description: string;
+  subtitle?: string;
   stock: number;
   images: string[];
   gallery: string[];
+  imageUrl?: string;
   video?: string;
   featured: boolean;
   promotion: boolean;
@@ -27,9 +29,11 @@ const initialForm: AdminProduct = {
   price: 0,
   oldPrice: 0,
   description: "",
+  subtitle: "",
   stock: 1,
   images: [],
   gallery: [],
+  imageUrl: "",
   video: "",
   featured: false,
   promotion: false,
@@ -104,6 +108,8 @@ export default function AdminProductManager() {
     try {
       const payload: AdminProduct = {
         ...form,
+        subtitle: form.subtitle?.trim() || "",
+        imageUrl: form.imageUrl?.trim() || "",
         price: Number(form.price || 0),
         oldPrice: Number(form.oldPrice || 0),
         stock: Number(form.stock || 0),
@@ -133,7 +139,13 @@ export default function AdminProductManager() {
 
   const handleEdit = (product: AdminProduct) => {
     setEditingId(product.id ?? null);
-    setForm({ ...product, images: product.images || [], gallery: product.gallery || [] });
+    setForm({
+      ...product,
+      subtitle: product.subtitle || "",
+      imageUrl: product.imageUrl || "",
+      images: product.images || [],
+      gallery: product.gallery || [],
+    });
   };
 
   const handleDelete = async (id?: string) => {
@@ -178,11 +190,29 @@ export default function AdminProductManager() {
               {categories.length ? categories.map((category) => <option key={category} value={category}>{category}</option>) : ["Huiles", "Compléments alimentaires", "Tisanes", "Produits de massage", "Cosmétiques", "Accessoires"].map((category) => <option key={category} value={category}>{category}</option>)}
             </select>
             <div className="grid gap-4 sm:grid-cols-2">
-              <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} placeholder="Prix" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
-              <input type="number" value={form.oldPrice || 0} onChange={(e) => setForm({ ...form, oldPrice: Number(e.target.value) })} placeholder="Ancien prix" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Prix (FCFA)</label>
+                <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} placeholder="Prix (FCFA)" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Ancien prix</label>
+                <input type="number" value={form.oldPrice || 0} onChange={(e) => setForm({ ...form, oldPrice: Number(e.target.value) })} placeholder="Ancien prix" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
+              </div>
             </div>
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" className="min-h-[120px] w-full rounded-2xl border border-gray-200 px-4 py-3" />
-            <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} placeholder="Stock" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Sous-titre du produit</label>
+              <input value={form.subtitle || ""} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} placeholder="Sous-titre du produit" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Stock</label>
+              <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} placeholder="Stock" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
+              <p className="mt-1 text-xs text-gray-500">Quantité disponible</p>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">URL de l&apos;image principale</label>
+              <input value={form.imageUrl || ""} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://..." className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
+            </div>
             <input value={form.video || ""} onChange={(e) => setForm({ ...form, video: e.target.value })} placeholder="Lien vidéo (optionnel)" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
           </div>
 
@@ -209,8 +239,8 @@ export default function AdminProductManager() {
             </label>
             <div className="rounded-2xl border border-dashed border-gray-200 p-4 text-sm text-gray-500">
               <div className="font-medium text-gray-700">URLs actuelles</div>
-              <div className="mt-2 break-all">Images: {form.images.join(", ") || "Aucune"}</div>
-              <div className="mt-1 break-all">Galerie: {form.gallery.join(", ") || "Aucune"}</div>
+              <div className="mt-2 break-all">Images : {form.images.join(", ") || "Aucune"}</div>
+              <div className="mt-1 break-all">Galerie : {form.gallery.join(", ") || "Aucune"}</div>
             </div>
           </div>
 
@@ -240,7 +270,7 @@ export default function AdminProductManager() {
               <tr>
                 <th className="py-3">Produit</th>
                 <th className="py-3">Catégorie</th>
-                <th className="py-3">Prix</th>
+                <th className="py-3">Prix (FCFA)</th>
                 <th className="py-3">Stock</th>
                 <th className="py-3">Statut</th>
                 <th className="py-3">Actions</th>
@@ -253,7 +283,7 @@ export default function AdminProductManager() {
                 <tr key={product.id} className="border-b border-gray-100">
                   <td className="py-3">{product.title}</td>
                   <td className="py-3">{product.category}</td>
-                  <td className="py-3">{product.price} €</td>
+                  <td className="py-3">{new Intl.NumberFormat("fr-FR").format(product.price)} FCFA</td>
                   <td className="py-3">{product.stock}</td>
                   <td className="py-3">{product.active ? "Actif" : "Désactivé"}</td>
                   <td className="py-3">
