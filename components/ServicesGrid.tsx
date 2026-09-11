@@ -3,15 +3,22 @@ import ServiceCard from "./ServiceCard";
 
 export default function ServicesGrid() {
   const items = [
-    { title: "Soin visage", description: "Routines naturelles et personnalisation" },
-    { title: "Massages", description: "Relaxation et bien-être profond" },
-    { title: "Aromathérapie", description: "Huiles essentielles biologiques" },
+    { title: "Soin visage", description: "Routines naturelles et personnalisation", href: "/services" },
+    { title: "Massages", description: "Relaxation et bien-être profond", href: "/services" },
+    { title: "Aromathérapie", description: "Huiles essentielles biologiques", href: "/services" },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {items.map((s) => (
-        <ServiceCard key={s.title} title={s.title} description={s.description} />
+    <div className="flex gap-4 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:pb-0">
+      {items.map((service) => (
+        <div key={service.title} className="min-w-[260px] flex-1 md:min-w-0">
+          <ServiceCard
+            title={service.title}
+            description={service.description}
+            href={service.href}
+            ctaLabel="Découvrir"
+          />
+        </div>
       ))}
     </div>
   );

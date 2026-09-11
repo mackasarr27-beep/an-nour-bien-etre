@@ -15,6 +15,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-padding-bottom: 6rem;
+}
+
 body {
   background:
     radial-gradient(circle at 4% 8%, rgba(56, 189, 168, 0.24), transparent 32rem),

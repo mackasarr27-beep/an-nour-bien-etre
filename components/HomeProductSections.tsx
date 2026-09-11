@@ -21,6 +21,33 @@ type Product = {
   images?: string[];
 };
 
+const fallbackProducts: Product[] = [
+  {
+    id: "fallback-articulaires",
+    title: "Complémentaire pour les douleurs articulaires",
+    subtitle: "Complément naturel pour accompagner le confort articulaire au quotidien.",
+    category: "Compléments alimentaires",
+    price: 10000,
+    img: "/Complementaire pour les douleurs articulaires.png",
+  },
+  {
+    id: "fallback-rhume-sinusite",
+    title: "Spray contre le rhume et la sinusite",
+    subtitle: "Spray pratique pour accompagner le confort respiratoire au quotidien.",
+    category: "Soins respiratoires",
+    price: 10000,
+    img: "/Spray contre la rhume et la sinusite.png",
+  },
+  {
+    id: "fallback-detox",
+    title: "Thé détox et amincissant",
+    subtitle: "Une boisson légère pour intégrer un moment détox dans votre routine.",
+    category: "Tisanes",
+    price: 10000,
+    img: "/Thé detox et amincissant.png",
+  },
+];
+
 const getProductImage = (product: Product) => product.imageUrl || product.img || product.images?.[0] || "";
 
 export default function HomeProductSections() {
@@ -51,18 +78,31 @@ export default function HomeProductSections() {
     return () => { mounted = false; };
   }, []);
 
+  const mergedProducts = useMemo(() => {
+    const uniqueProducts = new Map<string, Product>();
+
+    [...products, ...fallbackProducts].forEach((product) => {
+      const key = product.title?.trim().toLowerCase() || product.id;
+      if (!uniqueProducts.has(key)) {
+        uniqueProducts.set(key, product);
+      }
+    });
+
+    return Array.from(uniqueProducts.values());
+  }, [products]);
+
   const sections = useMemo(() => {
-    const popular = products.filter((product) => product.category && ["Huiles", "Compléments alimentaires", "Tisanes", "Produits de massage", "Cosmétiques", "Accessoires"].includes(product.category)).slice(0, 6);
-    const promotions = products.filter((product) => product.promotion || (typeof product.oldPrice === "number" && product.oldPrice > 0) || (typeof product.oldPrice === "string" && Number(product.oldPrice) > 0)).slice(0, 6);
-    const latest = [...products].slice(-6).reverse();
+    const popular = mergedProducts.filter((product) => product.category && ["Huiles", "Compléments alimentaires", "Tisanes", "Produits de massage", "Cosmétiques", "Accessoires"].includes(product.category)).slice(0, 6);
+    const promotions = mergedProducts.filter((product) => product.promotion || (typeof product.oldPrice === "number" && product.oldPrice > 0) || (typeof product.oldPrice === "string" && Number(product.oldPrice) > 0)).slice(0, 6);
+    const latest = [...mergedProducts].slice(-6).reverse();
 
     return [
-      { title: "Nos produits", subtitle: "Sélection premium", items: products.slice(0, 8) },
+      { title: "Nos produits", subtitle: "Sélection premium", items: mergedProducts.slice(0, 8) },
       { title: "Produits populaires", subtitle: "Les plus recherchés", items: popular },
       { title: "Promotions", subtitle: "À saisir", items: promotions },
       { title: "Nouveautés", subtitle: "Derniers arrivages", items: latest },
     ].filter((section) => section.items.length > 0);
-  }, [products]);
+  }, [mergedProducts]);
 
   const renderSection = (title: string, subtitle: string, items: Product[]) => {
     if (!items.length) return null;

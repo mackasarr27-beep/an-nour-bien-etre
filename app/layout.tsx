@@ -40,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="h-full antialiased">
-      <body className="min-h-full flex flex-col pb-24 md:pb-0">
+      <body className="min-h-full flex flex-col pb-32 md:pb-0">
         <CartProvider>{children}</CartProvider>
       </body>
     </html>
