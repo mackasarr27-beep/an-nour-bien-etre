@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../lib/firebase";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCart } from "../../../../components/CartContext";
 
 type Product = {
@@ -13,12 +13,14 @@ type Product = {
   description?: string;
   additionalInfo?: string;
   price?: number;
+  oldPrice?: number;
   stock?: number;
   img?: string;
   imageUrl?: string;
   images?: string[];
   gallery?: string[];
   category?: string;
+  videoUrl?: string;
 };
 
 function formatPrice(value: number | string | undefined) {
@@ -43,8 +45,9 @@ function getGalleryImages(product: Product) {
   return (product.gallery || []).filter((url) => Boolean(url));
 }
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function ProductPage() {
+  const params = useParams<{ id: string }>();
+  const id = params?.id ?? "";
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -63,11 +66,22 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         const d = await getDoc(doc(db, "products", id));
         if (mounted) {
           if (d.exists()) {
-            const data = d.data() as Omit<Product, "id" | "price"> & { price?: number | string };
+            const data = d.data() as Omit<Product, "id" | "price" | "oldPrice"> & { price?: number | string; oldPrice?: number | string };
             const resolvedProduct: Product = {
               id: d.id,
-              ...data,
+              title: String(data.title || "Produit"),
+              subtitle: data.subtitle || "",
+              description: data.description || "",
+              additionalInfo: data.additionalInfo || "",
               price: Number(data.price ?? 0),
+              oldPrice: data.oldPrice !== undefined && data.oldPrice !== null && data.oldPrice !== "" ? Number(data.oldPrice) : undefined,
+              stock: typeof data.stock === "number" ? data.stock : undefined,
+              img: data.img || "",
+              imageUrl: data.imageUrl || "",
+              images: Array.isArray(data.images) ? data.images.filter(Boolean) : [],
+              gallery: Array.isArray(data.gallery) ? data.gallery.filter(Boolean) : [],
+              category: data.category || "Produit",
+              videoUrl: data.videoUrl || "",
             };
             setProduct(resolvedProduct);
             setSelectedImage(getPrimaryImage(resolvedProduct));
@@ -86,7 +100,15 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   }, [id]);
 
   if (loading) return <div className="px-4 py-12 text-center text-slate-600">Chargement...</div>;
-  if (!product) return <div className="px-4 py-12 text-center text-slate-600">Produit non trouvé</div>;
+  if (!product) return <div className="px-4 py-12 text-center text-slate-600">
+    <div className="mx-auto max-w-xl rounded-3xl border border-emerald-900/10 bg-white p-8 shadow-sm">
+      <h1 className="text-2xl font-semibold text-slate-900">Produit introuvable</h1>
+      <p className="mt-3 text-slate-600">Le produit demandé n’existe pas ou n’est plus disponible.</p>
+      <button onClick={() => router.push("/shop")} className="mt-5 inline-flex items-center rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
+        Retour à la boutique
+      </button>
+    </div>
+  </div>;
 
   const primaryImage = getPrimaryImage(product);
   const galleryImages = getGalleryImages(product);
@@ -131,7 +153,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           </div>
 
           <div className="rounded-2xl border border-emerald-900/10 bg-emerald-50/60 p-4">
-            <div className="text-2xl font-bold text-emerald-900">{formatPrice(product.price)}</div>
+            <div className="flex items-end gap-3">
+              <div className="text-2xl font-bold text-emerald-900">{formatPrice(product.price)}</div>
+              {product.oldPrice !== undefined && product.oldPrice !== null && product.oldPrice > 0 ? (
+                <div className="text-base text-slate-400 line-through">{formatPrice(product.oldPrice)}</div>
+              ) : null}
+            </div>
             <div className="mt-2 flex items-center gap-2 text-sm text-slate-700">
               <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${typeof product.stock === "number" && product.stock > 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-700"}`}>
                 {typeof product.stock === "number" ? (product.stock > 0 ? `${product.stock} en stock` : "Rupture de stock") : "Disponibilité à vérifier"}
@@ -141,7 +168,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
           <div className="space-y-3">
             <button
-              onClick={() => addItem({ id: product.id, title: product.title, price: Number(product.price ?? 0), img: primaryImage })}
+              onClick={() => addItem({ id: product.id, title: product.title, price: Number(product.price ?? 0), img: primaryImage || "" })}
               className="w-full rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
             >
               Ajouter au panier
@@ -163,6 +190,15 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             <div className="rounded-2xl border border-emerald-900/10 bg-white p-4">
               <h2 className="text-lg font-semibold text-slate-900">Informations complémentaires</h2>
               <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">{product.additionalInfo}</p>
+            </div>
+          ) : null}
+
+          {product.videoUrl ? (
+            <div className="rounded-2xl border border-emerald-900/10 bg-white p-4">
+              <h2 className="text-lg font-semibold text-slate-900">Vidéo</h2>
+              <a href={product.videoUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center rounded-full border border-emerald-900/15 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
+                Ouvrir la vidéo
+              </a>
             </div>
           ) : null}
         </div>

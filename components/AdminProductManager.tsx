@@ -1,8 +1,8 @@
 "use client";
+import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, serverTimestamp } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "../lib/firebase";
+import { db } from "../lib/firebase";
 
 export type AdminProduct = {
   id?: string;
@@ -93,15 +93,23 @@ export default function AdminProductManager() {
 
   const uploadFiles = async (files: FileList | null) => {
     if (!files?.length) return [];
-    if (!storage) return [];
 
-    const urls: string[] = [];
-    for (const file of Array.from(files)) {
-      const storageRef = ref(storage, `products/${Date.now()}-${file.name}`);
-      await uploadBytes(storageRef, file);
-      urls.push(await getDownloadURL(storageRef));
+    const fileArray = Array.from(files);
+    const formData = new FormData();
+    fileArray.forEach((file) => formData.append("files", file));
+
+    const response = await fetch("/api/cloudinary-upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => ({}))) as { error?: string };
+      throw new Error(payload.error || "Impossible de télécharger les images.");
     }
-    return urls;
+
+    const payload = (await response.json()) as { urls?: string[] };
+    return payload.urls || [];
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,7 +130,7 @@ export default function AdminProductManager() {
       };
 
       if (!db) {
-        throw new Error("La base de données n’est pas configurée.");
+        throw new Error("La base de données n'est pas configurée.");
       }
 
       if (editingId) {
@@ -160,7 +168,24 @@ export default function AdminProductManager() {
 
   const setFiles = async (e: React.ChangeEvent<HTMLInputElement>, field: "images" | "gallery") => {
     const urls = await uploadFiles(e.target.files);
-    setForm((current) => ({ ...current, [field]: [...(current[field] || []), ...urls] }));
+
+    if (urls.length) {
+      setForm((current) => ({
+        ...current,
+        [field]: [...(current[field] || []), ...urls],
+        ...(field === "images" && !current.imageUrl ? { imageUrl: urls[0] } : {}),
+      }));
+    }
+
+    e.target.value = "";
+  };
+
+  const removeUploadedImage = (field: "images" | "gallery", index: number) => {
+    setForm((current) => ({
+      ...current,
+      [field]: (current[field] || []).filter((_, currentIndex) => currentIndex !== index),
+      ...(field === "images" && current.imageUrl ? { imageUrl: (current[field] || []).length > 1 ? (current[field] || [])[0] : "" } : {}),
+    }));
   };
 
   return (
@@ -242,13 +267,43 @@ export default function AdminProductManager() {
               Activer le produit
             </label>
             <label className="text-sm text-gray-600">
-              Image principale du produit
-              <input type="file" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={(e) => void setFiles(e, "images")} className="mt-2 block w-full text-sm" />
+              📤 Télécharger une image principale
+              <input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={(e) => void setFiles(e, "images")} className="mt-2 block w-full text-sm" />
             </label>
+            <div className="mt-3">
+              {form.images.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {form.images.map((url, index) => (
+                    <div key={`${url}-${index}`} className="relative">
+                      <Image src={url} alt={`Image principale ${index + 1}`} width={80} height={80} className="h-20 w-20 rounded-xl border border-gray-200 object-cover" />
+                      <button type="button" onClick={() => removeUploadedImage("images", index)} className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">×</button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500">Aucune image principale enregistrée.</p>
+              )}
+            </div>
+
             <label className="text-sm text-gray-600">
-              Galerie d&apos;images
+              📤 Ajouter des images à la galerie
               <input type="file" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={(e) => void setFiles(e, "gallery")} className="mt-2 block w-full text-sm" />
             </label>
+            <div className="mt-3">
+              {form.gallery.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {form.gallery.map((url, index) => (
+                    <div key={`${url}-${index}`} className="relative">
+                      <Image src={url} alt={`Image galerie ${index + 1}`} width={80} height={80} className="h-20 w-20 rounded-xl border border-gray-200 object-cover" />
+                      <button type="button" onClick={() => removeUploadedImage("gallery", index)} className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">×</button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500">Aucune image dans la galerie.</p>
+              )}
+            </div>
+
             <div className="rounded-2xl border border-dashed border-gray-200 p-4 text-sm text-gray-500">
               <div className="font-medium text-gray-700">URLs actuelles</div>
               <div className="mt-2 break-all">Images : {form.images.join(", ") || "Aucune"}</div>

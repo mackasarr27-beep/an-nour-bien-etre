@@ -55,9 +55,9 @@ export async function POST(request: Request) {
     const body = await request.json() as { type?: AppointmentEmailType; appointment?: AppointmentPayload };
     const type = body.type;
     const appointment = body.appointment;
-    const adminEmail = process.env.ADMIN_EMAIL?.trim();
-    const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || process.env.FROM_EMAIL?.trim();
-    const apiKey = process.env.RESEND_API_KEY?.trim();
+    const adminEmail = process.env.ADMIN_EMAIL?.trim() ?? "";
+    const fromEmail = process.env.RESEND_FROM_EMAIL?.trim() || process.env.FROM_EMAIL?.trim() || "";
+    const apiKey = process.env.RESEND_API_KEY?.trim() ?? "";
 
     if ((type !== "pending" && type !== "confirmed") || !appointment || !isValidAppointment(appointment)) {
       console.error("Appointment email rejected: invalid request payload", {

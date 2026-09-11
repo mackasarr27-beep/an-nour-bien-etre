@@ -5,6 +5,7 @@ import ServicesGrid from "../components/ServicesGrid";
 import SectionTitle from "../components/SectionTitle";
 import TestimonialCard from "../components/TestimonialCard";
 import CTASection from "../components/CTASection";
+import HomeProductSections from "../components/HomeProductSections";
 
 export default function Home() {
   return (
@@ -16,6 +17,10 @@ export default function Home() {
         <section className="max-w-7xl mx-auto px-4 py-12">
           <SectionTitle title="Nos soins" subtitle="Des protocoles pensés pour votre bien-être" />
           <ServicesGrid />
+        </section>
+
+        <section className="max-w-7xl mx-auto px-4 py-12">
+          <HomeProductSections />
         </section>
 
         <section className="max-w-7xl mx-auto px-4 py-12">

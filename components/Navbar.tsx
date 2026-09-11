@@ -19,6 +19,7 @@ const links = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   const { profile, loading } = useAuth();
   const isAdmin = !loading && profile?.role === "admin";
 
@@ -48,6 +49,7 @@ export default function Navbar() {
 
           <div className="hidden shrink-0 items-center justify-end gap-1 2xl:flex">
             <a href="/search" className="whitespace-nowrap rounded-lg px-2 py-2 text-[13px] font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">Recherche</a>
+            <Link href="/shop" className="whitespace-nowrap rounded-lg px-2 py-2 text-[13px] font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">Marques</Link>
             <a href="/cart" className="whitespace-nowrap rounded-lg px-2 py-2 text-[13px] font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">Panier</a>
             <Link href="/account" className="whitespace-nowrap rounded-lg px-2 py-2 text-[13px] font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">Mon compte</Link>
             <WhatsAppButton />
@@ -66,6 +68,13 @@ export default function Navbar() {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="border-t border-emerald-900/10 bg-white/90 px-4 py-3 2xl:hidden">
+        <Link href="/search" className="flex items-center gap-2 rounded-full border border-emerald-900/10 bg-emerald-50 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+          <span aria-hidden="true">🔍</span>
+          <span>Rechercher un produit...</span>
+        </Link>
       </div>
 
       <div className={`fixed inset-0 z-30 bg-black/70 backdrop-blur-sm transition-opacity duration-300 2xl:hidden ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setOpen(false)} />
@@ -93,21 +102,53 @@ export default function Navbar() {
               Administration
             </Link>
           )}
-          <div className="mt-2 grid gap-2 sm:grid-cols-3">
-            <Link href="/account" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-900/15 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900" onClick={() => setOpen(false)}>
-              <span aria-hidden="true">👤</span>
-              Mon compte
-            </Link>
-            <div className="inline-flex items-center justify-center">
-              <WhatsAppButton />
+
+          <button
+            type="button"
+            onClick={() => setShowMore((value) => !value)}
+            className="mt-1 rounded-xl border border-emerald-900/15 bg-white px-3 py-3 text-left text-base font-semibold text-slate-800 transition hover:bg-emerald-50"
+          >
+            ⋯ Plus {showMore ? "−" : "+"}
+          </button>
+
+          {showMore ? (
+            <div className="mt-1 grid gap-2 sm:grid-cols-3">
+              <Link href="/account" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-900/15 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900" onClick={() => setOpen(false)}>
+                <span aria-hidden="true">👤</span>
+                Mon compte
+              </Link>
+              <div className="inline-flex items-center justify-center">
+                <WhatsAppButton />
+              </div>
+              <div className="inline-flex items-center justify-center">
+                <CallButton />
+              </div>
             </div>
-            <div className="inline-flex items-center justify-center">
-              <CallButton />
-            </div>
-          </div>
+          ) : null}
           </div>
         </div>
       </div>
+
+      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-900/10 bg-white/95 px-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(15,118,110,0.08)] 2xl:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-4 gap-1">
+          <Link href="/" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
+            <span aria-hidden="true" className="text-base">🏠</span>
+            <span>Accueil</span>
+          </Link>
+          <Link href="/shop" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
+            <span aria-hidden="true" className="text-base">▦</span>
+            <span>Marques</span>
+          </Link>
+          <Link href="/cart" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
+            <span aria-hidden="true" className="text-base">🛒</span>
+            <span>Panier</span>
+          </Link>
+          <Link href="/account" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
+            <span aria-hidden="true" className="text-base">👤</span>
+            <span>Compte</span>
+          </Link>
+        </div>
+      </nav>
     </header>
   );
 }
