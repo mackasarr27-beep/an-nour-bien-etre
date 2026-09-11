@@ -1,4 +1,3 @@
-import Navbar from "../components/Navbar";
 import HeroBanner from "../components/HeroBanner";
 import Footer from "../components/Footer";
 import ServicesGrid from "../components/ServicesGrid";
@@ -10,7 +9,6 @@ import HomeProductSections from "../components/HomeProductSections";
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
-      <Navbar />
       <main className="flex-1">
         <HeroBanner />
 
