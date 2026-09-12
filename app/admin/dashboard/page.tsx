@@ -11,6 +11,7 @@ import CategoryManager from "../../../components/CategoryManager";
 import AppointmentAdminBoard from "../../../components/AppointmentAdminBoard";
 import MessageAdminBoard from "../../../components/MessageAdminBoard";
 import CustomerTable from "../../../components/CustomerTable";
+import OrdersTable from "../../../components/OrdersTable";
 import { db } from "../../../lib/firebase";
 
 type DashboardStat = { title: string; value: number; description: string };
@@ -100,6 +101,7 @@ export default function AdminDashboard() {
             <CategoryManager />
             <AppointmentAdminBoard />
             <MessageAdminBoard />
+            <OrdersTable />
             <CustomerTable />
           </section>
         </main>
