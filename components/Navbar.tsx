@@ -12,7 +12,7 @@ const links = [
   { href: "/", label: "Accueil" },
   { href: "/about", label: "À propos" },
   { href: "/services", label: "Nos soins" },
-  { href: "/shop", label: "Boutique" },
+  { href: "/brands", label: "Marques" },
   { href: "/appointments", label: "Rendez-vous" },
   { href: "/gallery", label: "Galerie" },
   { href: "/blog", label: "Blog" },
@@ -42,7 +42,8 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-emerald-900/10 bg-[linear-gradient(100deg,rgba(255,255,255,0.96),rgba(236,250,246,0.92),rgba(244,248,255,0.94))] text-slate-800 shadow-[0_8px_30px_rgba(15,118,110,0.06)] backdrop-blur-xl">
+    <>
+      <header className="sticky top-0 z-40 w-full border-b border-emerald-900/10 bg-[linear-gradient(100deg,rgba(255,255,255,0.96),rgba(236,250,246,0.92),rgba(244,248,255,0.94))] text-slate-800 shadow-[0_8px_30px_rgba(15,118,110,0.06)] backdrop-blur-xl">
       <div className="bg-emerald-700 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-white sm:text-[11px]">
         <div className="mx-auto max-w-[1600px] px-4 py-2">Livraison rapide • Paiement sécurisé • Boutique AN NOUR</div>
       </div>
@@ -61,9 +62,11 @@ export default function Navbar() {
               </svg>
             </button>
 
-            <Link href="/" className="flex shrink-0 items-center gap-2 whitespace-nowrap">
+            <Link href="/" className="flex min-w-0 items-center gap-2">
               <Image src="/logo.png" alt="AN NOUR BIEN-ÊTRE" width={46} height={46} className="rounded object-contain" />
-              <span className="text-sm font-semibold tracking-[0.2em] text-emerald-950 2xl:text-base">AN NOUR</span>
+              <span className="text-[11px] font-semibold leading-tight tracking-[0.12em] text-emerald-950 sm:text-xs 2xl:text-base">
+                AN NOUR BIEN ÊTRE
+              </span>
             </Link>
           </div>
 
@@ -105,7 +108,7 @@ export default function Navbar() {
           </div>
 
           <div className="hidden shrink-0 items-center justify-end gap-1 2xl:flex">
-            <Link href="/shop" className="rounded-full px-3 py-2 text-[13px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">Marques</Link>
+            <Link href="/brands" className="rounded-full px-3 py-2 text-[13px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">Marques</Link>
             <Link href="/account" className="rounded-full px-3 py-2 text-[13px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">Mon compte</Link>
             <Link href="/cart" className="relative rounded-full px-3 py-2 text-[13px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
               Panier
@@ -145,81 +148,85 @@ export default function Navbar() {
 
       <div className={`fixed inset-0 z-30 bg-black/70 backdrop-blur-sm transition-opacity duration-300 2xl:hidden ${open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setOpen(false)} />
 
-      <div className={`fixed inset-x-3 top-20 z-40 mx-auto max-w-2xl rounded-2xl border border-emerald-900/15 bg-white p-4 text-slate-900 shadow-2xl transition-all duration-300 2xl:hidden ${open ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0 pointer-events-none"}`}>
-        <div className="flex items-center justify-between">
-          <span className="font-semibold text-slate-900">Navigation</span>
-          <button className="rounded-full border border-slate-200 bg-slate-100 p-2 text-slate-900 transition hover:bg-slate-200" onClick={() => setOpen(false)} aria-label="Fermer le menu">✕</button>
-        </div>
-        <div className="mt-4 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-          <div className="flex flex-col gap-2">
-            {links.map((l) => (
-              <Link key={l.href} href={l.href} className="rounded-xl px-3 py-3 font-medium text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-800" onClick={() => setOpen(false)}>
-                {l.label}
-              </Link>
-            ))}
-            <Link href="/search" className="rounded-xl border border-emerald-900/15 bg-emerald-50 px-3 py-3 font-medium text-emerald-900 transition hover:bg-emerald-100" onClick={() => setOpen(false)}>
-              🔍 Recherche
-            </Link>
-            <Link href="/cart" className="rounded-xl border border-emerald-900/15 bg-emerald-50 px-3 py-3 font-medium text-emerald-900 transition hover:bg-emerald-100" onClick={() => setOpen(false)}>
-              🛒 Panier
-            </Link>
-            {isAdmin && (
-              <Link href="/admin/dashboard" className="rounded-xl bg-emerald-600 px-3 py-3 text-center font-semibold text-white" onClick={() => setOpen(false)}>
-                Administration
-              </Link>
-            )}
+      <div className={`fixed inset-0 z-40 bg-white text-slate-900 shadow-2xl transition-all duration-300 2xl:hidden ${open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-4 opacity-0"}`}>
+        <div className="flex h-full flex-col">
+          <div className="flex items-center justify-between border-b border-emerald-900/10 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
+            <span className="font-semibold text-slate-900">Navigation</span>
+            <button className="rounded-full border border-slate-200 bg-slate-100 p-2 text-slate-900 transition hover:bg-slate-200" onClick={() => setOpen(false)} aria-label="Fermer le menu">✕</button>
+          </div>
 
-            <button
-              type="button"
-              onClick={() => setShowMore((value) => !value)}
-              className="mt-1 rounded-xl border border-emerald-900/15 bg-white px-3 py-3 text-left text-base font-semibold text-slate-800 transition hover:bg-emerald-50"
-            >
-              ⋯ Plus {showMore ? "−" : "+"}
-            </button>
-
-            {showMore ? (
-              <div className="mt-1 grid gap-2 sm:grid-cols-3">
-                <Link href="/account" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-900/15 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900" onClick={() => setOpen(false)}>
-                  <span aria-hidden="true">👤</span>
-                  Mon compte
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4">
+            <div className="flex flex-col gap-2">
+              {links.map((l) => (
+                <Link key={l.href} href={l.href} className="rounded-xl px-3 py-3 font-medium text-slate-800 transition hover:bg-emerald-50 hover:text-emerald-800" onClick={() => setOpen(false)}>
+                  {l.label}
                 </Link>
-                <div className="inline-flex items-center justify-center">
-                  <WhatsAppButton />
+              ))}
+              <Link href="/search" className="rounded-xl border border-emerald-900/15 bg-emerald-50 px-3 py-3 font-medium text-emerald-900 transition hover:bg-emerald-100" onClick={() => setOpen(false)}>
+                🔍 Recherche
+              </Link>
+              <Link href="/cart" className="rounded-xl border border-emerald-900/15 bg-emerald-50 px-3 py-3 font-medium text-emerald-900 transition hover:bg-emerald-100" onClick={() => setOpen(false)}>
+                🛒 Panier
+              </Link>
+              {isAdmin && (
+                <Link href="/admin/dashboard" className="rounded-xl bg-emerald-600 px-3 py-3 text-center font-semibold text-white" onClick={() => setOpen(false)}>
+                  Administration
+                </Link>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setShowMore((value) => !value)}
+                className="mt-1 rounded-xl border border-emerald-900/15 bg-white px-3 py-3 text-left text-base font-semibold text-slate-800 transition hover:bg-emerald-50"
+              >
+                ⋯ Plus {showMore ? "−" : "+"}
+              </button>
+
+              {showMore ? (
+                <div className="mt-1 grid gap-2 sm:grid-cols-3">
+                  <Link href="/account" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-900/15 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900" onClick={() => setOpen(false)}>
+                    <span aria-hidden="true">👤</span>
+                    Mon compte
+                  </Link>
+                  <div className="inline-flex items-center justify-center">
+                    <WhatsAppButton />
+                  </div>
+                  <div className="inline-flex items-center justify-center">
+                    <CallButton />
+                  </div>
                 </div>
-                <div className="inline-flex items-center justify-center">
-                  <CallButton />
-                </div>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-900/10 bg-white/95 px-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(15,118,110,0.08)] 2xl:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-4 gap-1">
-          <Link href="/" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
-            <span aria-hidden="true" className="text-base">🏠</span>
-            <span>Accueil</span>
-          </Link>
-          <Link href="/shop" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
-            <span aria-hidden="true" className="text-base">▦</span>
-            <span>Marques</span>
-          </Link>
-          <Link href="/cart" className="relative flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
-            <span aria-hidden="true" className="text-base">🛒</span>
-            <span>Panier</span>
-            {cartCount > 0 && (
-              <span className="absolute right-3 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-700 px-1 text-[9px] font-bold text-white">
-                {cartCount}
-              </span>
-            )}
-          </Link>
-          <Link href="/account" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
-            <span aria-hidden="true" className="text-base">👤</span>
-            <span>Compte</span>
-          </Link>
-        </div>
-      </nav>
     </header>
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-emerald-900/10 bg-white/95 px-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(15,118,110,0.08)] 2xl:hidden">
+      <div className="mx-auto grid max-w-md grid-cols-4 gap-1">
+        <Link href="/" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
+          <span aria-hidden="true" className="text-base">🏠</span>
+          <span>Accueil</span>
+        </Link>
+        <Link href="/brands" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
+          <span aria-hidden="true" className="text-base">▦</span>
+          <span>Marques</span>
+        </Link>
+        <Link href="/cart" className="relative flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
+          <span aria-hidden="true" className="text-base">🛒</span>
+          <span>Panier</span>
+          {cartCount > 0 && (
+            <span className="absolute right-3 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-700 px-1 text-[9px] font-bold text-white">
+              {cartCount}
+            </span>
+          )}
+        </Link>
+        <Link href="/account" className="flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">
+          <span aria-hidden="true" className="text-base">👤</span>
+          <span>Compte</span>
+        </Link>
+      </div>
+</nav>
+    </>
   );
 }

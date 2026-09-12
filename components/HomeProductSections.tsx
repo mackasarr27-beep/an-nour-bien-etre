@@ -65,7 +65,11 @@ export default function HomeProductSections() {
         }
 
         const snapshot = await getDocs(collection(db, "products"));
-        const items = snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Product, "id">) }));
+        const items = snapshot.docs.map((docSnapshot) => {
+          const data = docSnapshot.data() as Omit<Product, "id"> & { id?: string };
+          const { id: _ignoredId, ...rest } = data;
+          return { ...rest, id: docSnapshot.id } as Product;
+        });
         if (mounted) setProducts(items);
       } catch (error) {
         console.error("Failed to load products for homepage", error);
@@ -109,7 +113,7 @@ export default function HomeProductSections() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {productsToDisplay.map((product) => {
           const productImage = getProductImage(product);
 
@@ -126,14 +130,14 @@ export default function HomeProductSections() {
                 stock={typeof product.stock === "number" ? product.stock : undefined}
               />
               <div className="mt-3 flex gap-2">
-                <Link href={`/shop/product/${product.id}`} className="flex-1 rounded-full border border-emerald-900/15 bg-white px-4 py-2 text-center text-sm font-semibold text-slate-700 transition hover:bg-emerald-50">
-                  Voir les détails
+                <Link href={`/shop/product/${product.id}`} className="flex-1 rounded-full border border-emerald-900/15 bg-white px-3 py-2 text-center text-[11px] font-semibold text-slate-700 transition hover:bg-emerald-50 sm:text-sm">
+                  Voir le produit
                 </Link>
                 <button
                   onClick={() => addItem({ id: product.id, title: product.title, price: Number(product.price ?? 0), img: productImage })}
-                  className="flex-1 rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                  className="flex-1 rounded-full bg-emerald-700 px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-emerald-800 sm:text-sm"
                 >
-                  Ajouter
+                  Ajouter au panier
                 </button>
               </div>
             </div>

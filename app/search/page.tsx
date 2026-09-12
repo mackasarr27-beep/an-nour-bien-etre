@@ -7,7 +7,7 @@ import ProductCard from "../../components/ProductCard";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
-type Product = { id: string; title: string; price?: number | string; img?: string; imageUrl?: string; images?: string[]; category?: string; subtitle?: string };
+type Product = { id: string; title: string; price?: number | string; img?: string; imageUrl?: string; images?: string[]; category?: string; brand?: string; subtitle?: string };
 
 export default function SearchPage() {
   const [query, setQuery] = useState(() => (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("q") ?? "" : ""));
@@ -18,7 +18,15 @@ export default function SearchPage() {
     const loadProducts = async () => {
       if (!db) return;
       const snapshot = await getDocs(collection(db, "products"));
-      if (mounted) setProducts(snapshot.docs.map((item) => ({ id: item.id, ...(item.data() as Omit<Product, "id">) })));
+      if (mounted) {
+        setProducts(
+          snapshot.docs.map((docSnapshot) => {
+            const fetched = docSnapshot.data() as Omit<Product, "id"> & { id?: string };
+            const { id: _ignoredId, ...rest } = fetched;
+            return { ...rest, id: docSnapshot.id } as Product;
+          })
+        );
+      }
     };
     void loadProducts();
     return () => { mounted = false; };
@@ -32,7 +40,7 @@ export default function SearchPage() {
     }
 
     return products.filter((product) => {
-      const haystack = `${product.title ?? ""} ${product.category ?? ""} ${product.subtitle ?? ""}`.toLowerCase();
+      const haystack = `${product.title ?? ""} ${product.category ?? ""} ${product.brand ?? ""} ${product.subtitle ?? ""}`.toLowerCase();
       return haystack.includes(normalizedQuery);
     });
   }, [products, query]);
@@ -46,17 +54,18 @@ export default function SearchPage() {
         <div className="mt-6"><SearchBar value={query} onChange={setQuery} /></div>
       </div>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="rounded-2xl border border-emerald-900/10 bg-white/95 p-4 shadow-sm">
+          <div key={product.id} className="flex flex-col">
             <ProductCard
               title={product.title}
               category={product.category}
+              brand={product.brand || product.category}
               subtitle={product.subtitle}
               price={product.price}
               img={product.imageUrl || product.img || product.images?.[0]}
             />
-            <Link href={`/shop/product/${product.id}`} className="mt-3 inline-flex rounded-full border border-emerald-900/15 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-emerald-50">Voir les détails</Link>
+            <Link href={`/shop/product/${product.id}`} className="mt-3 inline-flex rounded-full border border-emerald-900/15 px-3 py-2 text-center text-sm font-semibold text-slate-700 transition hover:bg-emerald-50">Voir le produit</Link>
           </div>
         ))}
       </div>

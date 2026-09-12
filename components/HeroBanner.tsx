@@ -6,18 +6,22 @@ import React from "react";
 export default function HeroBanner() {
   return (
     <section className="w-full overflow-hidden">
-      <div className="relative isolate h-[38svh] min-h-[300px] max-h-[340px] sm:h-[66svh] sm:min-h-[480px] sm:max-h-none lg:h-[82svh] lg:min-h-[680px]">
-        <Image
-          src="/Bannière.png"
-          alt="Bannière An Nour"
-          fill
-          priority
-          quality={100}
-          sizes="100vw"
-          className="h-full w-full object-cover object-center sm:object-contain"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-center px-3 pb-3 sm:px-4 sm:pb-8 lg:pb-12">
+      <div className="relative isolate">
+        <div className="relative w-full overflow-hidden sm:h-[66svh] sm:min-h-[480px] sm:max-h-none lg:h-[82svh] lg:min-h-[680px]">
+          <Image
+            src="/Bannière.png"
+            alt="Bannière An Nour"
+            width={1983}
+            height={793}
+            priority
+            quality={75}
+            sizes="100vw"
+            className="block h-auto w-full sm:absolute sm:inset-0 sm:h-full sm:w-full sm:object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+        </div>
+
+        <div className="flex justify-center px-3 pb-3 sm:absolute sm:inset-x-0 sm:bottom-0 sm:px-4 sm:pb-8 lg:pb-12">
           <div className="w-full max-w-3xl rounded-[24px] border border-white/25 bg-slate-950/65 px-3 py-4 text-center text-white shadow-2xl backdrop-blur-sm sm:rounded-[28px] sm:px-8 sm:py-7">
             <p className="text-[11px] uppercase tracking-[0.3em] text-emerald-200 sm:text-xs">Soins premium • Bien-être • Sérénité</p>
             <h1 className="mt-2 text-[1.7rem] font-semibold leading-tight sm:mt-3 sm:text-4xl md:text-6xl">AN NOUR BIEN-ÊTRE</h1>

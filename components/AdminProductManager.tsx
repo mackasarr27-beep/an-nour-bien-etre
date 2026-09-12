@@ -1,6 +1,6 @@
 "use client";
-import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { addDoc, collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
@@ -8,6 +8,7 @@ export type AdminProduct = {
   id?: string;
   title: string;
   category: string;
+  brand?: string;
   price: number;
   oldPrice?: number;
   description: string;
@@ -27,6 +28,7 @@ export type AdminProduct = {
 const initialForm: AdminProduct = {
   title: "",
   category: "Huiles",
+  brand: "",
   price: 0,
   oldPrice: 0,
   description: "",
@@ -120,6 +122,7 @@ export default function AdminProductManager() {
         ...form,
         subtitle: form.subtitle?.trim() || "",
         additionalInfo: form.additionalInfo?.trim() || "",
+        brand: form.brand?.trim() || "",
         imageUrl: form.imageUrl?.trim() || "",
         price: Number(form.price || 0),
         oldPrice: Number(form.oldPrice || 0),
@@ -154,6 +157,7 @@ export default function AdminProductManager() {
       ...product,
       subtitle: product.subtitle || "",
       additionalInfo: product.additionalInfo || "",
+      brand: product.brand || "",
       imageUrl: product.imageUrl || "",
       images: product.images || [],
       gallery: product.gallery || [],
@@ -218,6 +222,10 @@ export default function AdminProductManager() {
             <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full rounded-2xl border border-gray-200 px-4 py-3">
               {categories.length ? categories.map((category) => <option key={category} value={category}>{category}</option>) : ["Huiles", "Compléments alimentaires", "Tisanes", "Produits de massage", "Cosmétiques", "Accessoires"].map((category) => <option key={category} value={category}>{category}</option>)}
             </select>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Marque</label>
+              <input value={form.brand || ""} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="Marque du produit" className="w-full rounded-2xl border border-gray-200 px-4 py-3" />
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">Prix (FCFA)</label>
@@ -275,7 +283,7 @@ export default function AdminProductManager() {
                 <div className="flex flex-wrap gap-2">
                   {form.images.map((url, index) => (
                     <div key={`${url}-${index}`} className="relative">
-                      <Image src={url} alt={`Image principale ${index + 1}`} width={80} height={80} className="h-20 w-20 rounded-xl border border-gray-200 object-cover" />
+                      <img src={url} alt={`Image principale ${index + 1}`} className="h-20 w-20 rounded-xl border border-gray-200 object-cover" />
                       <button type="button" onClick={() => removeUploadedImage("images", index)} className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">×</button>
                     </div>
                   ))}
@@ -294,7 +302,7 @@ export default function AdminProductManager() {
                 <div className="flex flex-wrap gap-2">
                   {form.gallery.map((url, index) => (
                     <div key={`${url}-${index}`} className="relative">
-                      <Image src={url} alt={`Image galerie ${index + 1}`} width={80} height={80} className="h-20 w-20 rounded-xl border border-gray-200 object-cover" />
+                      <img src={url} alt={`Image galerie ${index + 1}`} className="h-20 w-20 rounded-xl border border-gray-200 object-cover" />
                       <button type="button" onClick={() => removeUploadedImage("gallery", index)} className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">×</button>
                     </div>
                   ))}
@@ -315,6 +323,9 @@ export default function AdminProductManager() {
             <button type="submit" disabled={uploading} className="rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white">
               {uploading ? "Enregistrement..." : editingId ? "Enregistrer les modifications" : "Ajouter un produit"}
             </button>
+            <Link href="/admin/print" className="inline-flex items-center rounded-full border border-emerald-900/15 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-emerald-50">
+              🖨️ Imprimer les produits
+            </Link>
             {editingId && (
               <button type="button" onClick={() => { setEditingId(null); setForm(initialForm); }} className="rounded-full border border-gray-200 px-5 py-3 text-sm font-semibold">
                 Annuler
@@ -337,6 +348,7 @@ export default function AdminProductManager() {
               <tr>
                 <th className="py-3">Produit</th>
                 <th className="py-3">Catégorie</th>
+                <th className="py-3">Marque</th>
                 <th className="py-3">Prix (FCFA)</th>
                 <th className="py-3">Stock</th>
                 <th className="py-3">Statut</th>
@@ -345,11 +357,12 @@ export default function AdminProductManager() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="py-4">Chargement...</td></tr>
+                <tr><td colSpan={7} className="py-4">Chargement...</td></tr>
               ) : filteredProducts.map((product) => (
                 <tr key={product.id} className="border-b border-gray-100">
                   <td className="py-3">{product.title}</td>
                   <td className="py-3">{product.category}</td>
+                  <td className="py-3">{product.brand || "-"}</td>
                   <td className="py-3">{new Intl.NumberFormat("fr-FR").format(product.price)} FCFA</td>
                   <td className="py-3">{product.stock}</td>
                   <td className="py-3">{product.active ? "Actif" : "Désactivé"}</td>

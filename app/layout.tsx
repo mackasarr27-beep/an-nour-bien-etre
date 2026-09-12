@@ -41,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="h-full antialiased">
-      <body className="min-h-full flex flex-col pb-32 md:pb-0">
+      <body className="min-h-full flex flex-col pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-0">
         <CartProvider>
           <Navbar />
           {children}

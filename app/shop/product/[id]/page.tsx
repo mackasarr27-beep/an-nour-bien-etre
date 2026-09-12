@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../../../../lib/firebase";
 import { useParams, useRouter } from "next/navigation";
 import { useCart } from "../../../../components/CartContext";
@@ -20,6 +19,7 @@ type Product = {
   images?: string[];
   gallery?: string[];
   category?: string;
+  brand?: string;
   videoUrl?: string;
 };
 
@@ -58,17 +58,30 @@ export default function ProductPage() {
     let mounted = true;
     (async () => {
       try {
-        if (!db) {
+        if (!db || !id) {
           if (mounted) setProduct(null);
           return;
         }
 
-        const d = await getDoc(doc(db, "products", id));
+        const directDoc = await getDoc(doc(db, "products", id));
+        let matchedSnapshot = directDoc.exists() ? directDoc : null;
+
+        if (!matchedSnapshot) {
+          const snapshot = await getDocs(collection(db, "products"));
+          const legacyMatch = snapshot.docs.find((docSnapshot) => {
+            const data = docSnapshot.data() as Record<string, unknown>;
+            const candidates = [docSnapshot.id, data.id, data.slug, data.productId].filter((value) => value !== undefined && value !== null && value !== "");
+            return candidates.some((candidate) => String(candidate) === String(id));
+          });
+
+          matchedSnapshot = legacyMatch ?? null;
+        }
+
         if (mounted) {
-          if (d.exists()) {
-            const data = d.data() as Omit<Product, "id" | "price" | "oldPrice"> & { price?: number | string; oldPrice?: number | string };
+          if (matchedSnapshot && matchedSnapshot.exists()) {
+            const data = matchedSnapshot.data() as Omit<Product, "id" | "price" | "oldPrice"> & { price?: number | string; oldPrice?: number | string; id?: string };
             const resolvedProduct: Product = {
-              id: d.id,
+              id: matchedSnapshot.id,
               title: String(data.title || "Produit"),
               subtitle: data.subtitle || "",
               description: data.description || "",
@@ -81,6 +94,7 @@ export default function ProductPage() {
               images: Array.isArray(data.images) ? data.images.filter(Boolean) : [],
               gallery: Array.isArray(data.gallery) ? data.gallery.filter(Boolean) : [],
               category: data.category || "Produit",
+              brand: data.brand || "",
               videoUrl: data.videoUrl || "",
             };
             setProduct(resolvedProduct);
@@ -123,7 +137,7 @@ export default function ProductPage() {
         <div>
           <div className="overflow-hidden rounded-[28px] border border-emerald-900/10 bg-white shadow-[0_20px_60px_rgba(15,118,110,0.08)]">
             {selectedImage ? (
-              <Image src={selectedImage} alt={product.title} width={1200} height={900} className="h-[420px] w-full object-cover" />
+              <img src={selectedImage} alt={product.title} className="h-[420px] w-full object-cover" />
             ) : (
               <div className="flex h-[420px] items-center justify-center bg-slate-100 text-slate-500">Image indisponible</div>
             )}
@@ -138,7 +152,7 @@ export default function ProductPage() {
                   onClick={() => setSelectedImage(image)}
                   className={`overflow-hidden rounded-2xl border ${selectedImage === image ? "border-emerald-700" : "border-emerald-900/10"}`}
                 >
-                  <Image src={image} alt={`${product.title} ${index + 1}`} width={400} height={300} className="h-24 w-full object-cover" />
+                  <img src={image} alt={`${product.title} ${index + 1}`} className="h-24 w-full object-cover" />
                 </button>
               ))}
             </div>
@@ -148,6 +162,7 @@ export default function ProductPage() {
         <div className="space-y-5">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">{product.category || "Produit"}</p>
+            {product.brand ? <p className="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">{product.brand}</p> : null}
             <h1 className="mt-2 text-3xl font-semibold text-slate-900">{product.title}</h1>
             {product.subtitle ? <p className="mt-2 text-base text-slate-600">{product.subtitle}</p> : null}
           </div>
