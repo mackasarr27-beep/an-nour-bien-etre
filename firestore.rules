@@ -24,10 +24,7 @@ service cloud.firestore {
       allow create: if isOwner(userId)
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.email == request.auth.token.email
-        && (
-          (isAdmin() && request.resource.data.role == "admin")
-          || (!isAdmin() && request.resource.data.role == "client")
-        );
+        && request.resource.data.role in ["client", "admin"];
 
       allow update: if isAdmin()
         || (
