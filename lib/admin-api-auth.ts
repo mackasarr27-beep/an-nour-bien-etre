@@ -52,6 +52,12 @@ export async function authorizeAdminRequest(request: Request): Promise<AdminAuth
 
     return { authorized: true, uid: decodedToken.uid };
   } catch (error) {
+    const code = error && typeof error === "object" && "code" in error ? error.code : undefined;
+    const invalidTokenCodes = new Set(["auth/id-token-expired", "auth/id-token-revoked", "auth/argument-error", "auth/invalid-id-token", "auth/user-disabled", "auth/user-not-found"]);
+    if (typeof code !== "string" || !invalidTokenCodes.has(code)) {
+      console.error("Firebase token verification service unavailable", { code: typeof code === "string" && /^auth\/[a-z-]+$/.test(code) ? code : "unknown" });
+      return { authorized: false, status: 503, message: "La vérification de session est indisponible. Réessayez ou contactez l’administrateur technique." };
+    }
     console.warn("Firebase admin API token verification failed", {
       errorName: error instanceof Error ? error.name : "UnknownError",
     });

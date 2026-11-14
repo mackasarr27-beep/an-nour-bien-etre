@@ -80,7 +80,18 @@ function validatePrivateKey(
   }
 }
 
-async function getServerApp() {
+let serverAppPromise: Promise<import("firebase-admin/app").App> | undefined;
+
+function getServerApp() {
+  // Share initialization between concurrent requests; allow retry after a failure.
+  serverAppPromise ??= initializeServerApp().catch((error) => {
+    serverAppPromise = undefined;
+    throw error;
+  });
+  return serverAppPromise;
+}
+
+async function initializeServerApp() {
   let appModule: typeof import("firebase-admin/app");
   try {
     appModule = await import("firebase-admin/app");
