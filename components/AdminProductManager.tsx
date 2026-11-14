@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { addDoc, collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 
 export type AdminProduct = {
   id?: string;
@@ -96,22 +96,37 @@ export default function AdminProductManager() {
   const uploadFiles = async (files: FileList | null) => {
     if (!files?.length) return [];
 
+    const user = auth?.currentUser;
+    if (!user) throw new Error("Connexion administrateur requise. Reconnectez-vous.");
     const fileArray = Array.from(files);
-    const formData = new FormData();
-    fileArray.forEach((file) => formData.append("files", file));
-
-    const response = await fetch("/api/cloudinary-upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const payload = (await response.json().catch(() => ({}))) as { error?: string };
-      throw new Error(payload.error || "Impossible de télécharger les images.");
+    if (fileArray.length > 10) throw new Error("Maximum 10 fichiers par importation.");
+    for (const file of fileArray) {
+      if (!["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif", "video/mp4", "video/webm", "video/quicktime"].includes(file.type)) throw new Error("Format de fichier non accepté.");
+      if (!file.size || file.size > (file.type.startsWith("video/") ? 100 : 15) * 1024 * 1024) throw new Error("Fichier vide ou trop volumineux (image : 15 Mo, vidéo : 100 Mo).");
     }
-
-    const payload = (await response.json()) as { urls?: string[] };
-    return payload.urls || [];
+    const token = await user.getIdToken();
+    const urls: string[] = [];
+    for (const file of fileArray) {
+      const response = await fetch("/api/cloudinary-upload-signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ folder: "products" }),
+      });
+      const signed = await response.json();
+      if (!response.ok) throw new Error(signed.error || "Signature d’importation indisponible.");
+      const formData = new FormData();
+      formData.append("file", file);
+      for (const key of ["timestamp", "folder", "overwrite", "signature"]) formData.append(key, String(signed[key]));
+      formData.append("api_key", signed.apiKey);
+      const resourceType = file.type.startsWith("video/") ? "video" : "image";
+      const uploaded = await fetch(`https://api.cloudinary.com/v1_1/${signed.cloudName}/${resourceType}/upload`, { method: "POST", body: formData });
+      const result = await uploaded.json().catch(() => ({}));
+      if (!uploaded.ok) throw new Error(`Importation Cloudinary refusée (HTTP ${uploaded.status}). Vérifiez le quota, le format et la taille du fichier.`);
+      const url = new URL(result.secure_url);
+      if (url.protocol !== "https:" || url.hostname !== "res.cloudinary.com") throw new Error("URL Cloudinary invalide.");
+      urls.push(url.href);
+    }
+    return urls;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,7 +186,10 @@ export default function AdminProductManager() {
   };
 
   const setFiles = async (e: React.ChangeEvent<HTMLInputElement>, field: "images" | "gallery") => {
-    const urls = await uploadFiles(e.target.files);
+    const input = e.currentTarget;
+    setUploading(true);
+    try {
+    const urls = await uploadFiles(input.files);
 
     if (urls.length) {
       setForm((current) => ({
@@ -181,7 +199,12 @@ export default function AdminProductManager() {
       }));
     }
 
-    e.target.value = "";
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Importation impossible. Réessayez.");
+    } finally {
+      input.value = "";
+      setUploading(false);
+    }
   };
 
   const removeUploadedImage = (field: "images" | "gallery", index: number) => {

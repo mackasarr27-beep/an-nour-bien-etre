@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { authorizeAdminRequest } from "../../../lib/admin-api-auth";
 
+import { getCloudinaryCredentials, safeCloudinaryError } from "../../../lib/cloudinary-config";
+
 export const runtime = "nodejs";
 
 const maxUploadBytes = 100 * 1024 * 1024;
@@ -9,7 +11,7 @@ const maxImageBytes = 15 * 1024 * 1024;
 const maxVideoBytes = 100 * 1024 * 1024;
 const imageMimeTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]);
 const videoMimeTypes = new Set(["video/mp4", "video/webm", "video/quicktime"]);
-const uploadFolders = new Set(["products", "gallery", "blog"]);
+const uploadFolders = new Set(["products", "gallery", "blog", "banners"]);
 
 type CloudinaryUploadResult = {
   secure_url?: string;
@@ -23,10 +25,6 @@ type CloudinaryUploadResult = {
   error?: { message?: string };
 };
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  return error instanceof Error && error.message ? error.message : fallback;
-}
-
 function validCloudinaryUrl(value: unknown): value is string {
   if (typeof value !== "string") return false;
 
@@ -39,18 +37,9 @@ function validCloudinaryUrl(value: unknown): value is string {
 }
 
 async function uploadWithSdk(file: File, folder: string, resourceType: "image" | "video") {
-  const cloudinaryUrl = process.env.CLOUDINARY_URL?.trim();
-  const hasCloudinaryUrl = cloudinaryUrl?.startsWith("cloudinary://") ?? false;
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME ?? process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
+  const credentials = getCloudinaryCredentials();
   const { v2: cloudinary } = await import("cloudinary");
-  if (hasCloudinaryUrl && cloudinaryUrl) {
-    cloudinary.config({ cloudinary_url: cloudinaryUrl });
-  } else {
-    cloudinary.config({ cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret });
-  }
+  cloudinary.config(credentials);
 
   const buffer = Buffer.from(await file.arrayBuffer());
   return new Promise<CloudinaryUploadResult>((resolve, reject) => {
@@ -188,9 +177,9 @@ export async function POST(request: Request) {
           ? await uploadWithSdk(file, folder, resourceType)
           : await uploadWithPreset(file, folder, resourceType, cloudName!, uploadPreset!);
       } catch (error) {
-        const message = getErrorMessage(error, "Cloudinary a refusé le téléversement.");
-        console.error("Cloudinary upload failed", { message, resourceType, folder });
-        return NextResponse.json({ error: `Échec du téléversement Cloudinary : ${message}` }, { status: 502 });
+        const failure = safeCloudinaryError(error);
+        console.error("Cloudinary upload failed", { code: failure.code, resourceType, folder });
+        return NextResponse.json(failure, { status: 502 });
       }
 
       if (!validCloudinaryUrl(uploaded.secure_url)) {
@@ -215,11 +204,10 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ urls: assets.map((asset) => asset.url), assets });
-  } catch (error) {
-    const message = getErrorMessage(error, "Erreur inattendue pendant le téléversement.");
-    console.error("Cloudinary route error", { message });
+  } catch {
+    console.error("Cloudinary route error", { code: "UPLOAD_REQUEST_FAILED" });
     return NextResponse.json(
-      { error: `Une erreur est survenue pendant le téléversement Cloudinary : ${message}` },
+      { code: "UPLOAD_REQUEST_FAILED", error: "Impossible de traiter le fichier. Vérifiez le format de la demande et réessayez." },
       { status: 500 },
     );
   }
